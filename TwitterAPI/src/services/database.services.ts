@@ -1,16 +1,26 @@
-import mongoose from 'mongoose'
+import { MongoClient } from 'mongodb'
+import { config } from 'dotenv'
+config()
+console.log(process.env.DB_USERNAME)
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@twitter.t2qmyif.mongodb.net/?appName=Twitter`
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
 
 class DatabaseService {
+  private client: MongoClient
+  constructor() {
+    this.client = new MongoClient(uri)
+  }
   async connect() {
-    const uri = process.env.MONGO_URI?.trim();
-    if (!uri) throw new Error('MONGO_URI is missing');
-
     try {
-      await mongoose.connect(uri)
-      console.log('MongoDB connected successfully ✔')
-    } catch (error) {
-      console.error('MongoDB connection error ❌', error)
-      process.exit(1)
+      // Connect the client to the server	(optional starting in v4.7)
+      await this.client.connect()
+      // Send a ping to confirm a successful connection
+      await this.client.db('admin').command({ ping: 1 })
+      console.log('Pinged your deployment. You successfully connected to MongoDB!')
+    } finally {
+      // Ensures that the client will close when you finish/error
+      await this.client.close()
     }
   }
 }
