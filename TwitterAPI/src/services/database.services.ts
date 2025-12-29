@@ -2,7 +2,7 @@ import { MongoClient, Db, Collection } from 'mongodb'
 import { config } from 'dotenv'
 import User from '../models/schemas/Users.model'
 config()
-console.log(process.env.DB_USERNAME)
+
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@twitter.t2qmyif.mongodb.net/?appName=Twitter`
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
