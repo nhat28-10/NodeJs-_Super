@@ -1,3 +1,18 @@
 export const USER_MESSAGE = {
-  VALIDATION_ERROR: 'Validation error'
+  VALIDATION_ERROR: 'Validation error',
+  NAME_IS_REQUIRED: ' Name is required',
+  NAME_MUST_BE_STRING: 'Name must be a string',
+  EMAIL_ALREADY_EXISTS: 'Email already exists',
+  EMAIL_IS_REQUIRED: 'Email is required',
+  EMAIL_IS_INVALID: 'Email is invalid',
+  EMAIL_ALREADY_EXIST: 'Email already exists',
+  PASSWORD_IS_REQUIRED: 'Password is required',
+  PASSWORD_MUST_BE_STRING: 'Password must be a string',
+  PASSWORD_MUSTBE_AT_LEAST_6_CHARACTERS: 'Password must be at least 6 characters',
+  PASSWORD_MUST_BE_STRONG: 'Password must be at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 speacial character',
+  CONFIRM_PASSWORD_IS_REQUIRED: 'Confirm password is required',
+  CONFIRM_PASSWORD_MUST_BE_STRING: 'Confirm password must be a string',
+  CONFIRM_PASSWORD_MUSTBE_AT_LEAST_6_CHARACTERS: 'Confirm password must be at least 6 characters',
+  CONFIRM_PASSWORD_MUST_BE_STRONG: 'Confirm password must be at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special character',
+  DATE_OF_BIRTH_IS_ISO8601: 'Date of birth must be in ISO 8601 date formats'
 } as const
