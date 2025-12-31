@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { loginController, registerController } from '~/controllers/users.controller'
-import { accessTokenValidator, loginValidator, registerValidator } from '~/middlewares/users.middlewares'
+import { loginController, logoutController, registerController } from '~/controllers/users.controller'
+import { accessTokenValidator, loginValidator, refreshTokenValidator, registerValidator } from '~/middlewares/users.middlewares'
 import { warpRequestHandler } from '~/utils/handlers'
 
 const usersRouter = Router()
@@ -30,7 +30,5 @@ usersRouter.post('/register', registerValidator, warpRequestHandler(registerCont
  * Header: {Authorization: Bearer <access_token>}
  * Body: {refresh_token:string}
  */
-usersRouter.post('/logout', accessTokenValidator, warpRequestHandler((req, res) => {
-  res.json({message:'Logout success'})
-}))
+usersRouter.post('/logout', accessTokenValidator,refreshTokenValidator, warpRequestHandler(logoutController))
 export default usersRouter
