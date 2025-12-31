@@ -1,7 +1,7 @@
 import { sign } from 'crypto'
 import jwt, { SignOptions } from 'jsonwebtoken'
 
-export const signToken = ({ payload, privateKey = process.env.JWT_SECRET as string, options = {algorithm: 'HS256'}} :{
+export const signToken = ({ payload, privateKey = process.env.JWT_SECRET as string, options = { algorithm: 'HS256' } }: {
   payload: string | Buffer | object
   privateKey?: string
   options?: SignOptions
@@ -21,3 +21,14 @@ signToken({
     algorithm: 'HS256'
   }
 })
+export const verifyToken = ({ token, secretOrPublicKey = process.env.JWT_SECRET as string }:
+  { token: string, secretOrPublicKey?: string }) => {
+  return new Promise<jwt.JwtPayload>((resolve, reject) => {
+    jwt.verify(token, secretOrPublicKey, (error, decoded) => {
+      if (error) {
+        throw reject(error)
+      }
+      resolve(decoded as jwt.JwtPayload)
+    })
+  })
+}

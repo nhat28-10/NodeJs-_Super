@@ -17,5 +17,7 @@ export const USER_MESSAGE = {
   CONFIRM_PASSWORD_MUST_BE_STRONG: 'Confirm password must be at least 1 uppercase letter, 1 lowercase letter, 1 number, 1 special character',
   DATE_OF_BIRTH_IS_ISO8601: 'Date of birth must be in ISO 8601 date formats',  
   LOGIN_SUCCESS: 'Login success',
-  REGISTER_SUCCESS: 'Register success'
+  REGISTER_SUCCESS: 'Register success',
+  ACCESS_TOKEN_IS_REQUIRED: 'Access token is required',
+  ACCESS_TOKEN_IS_INVALID: 'Access token is invalid',
 } as const
