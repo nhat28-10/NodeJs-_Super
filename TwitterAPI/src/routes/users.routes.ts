@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { loginController, logoutController, registerController } from '~/controllers/users.controller'
-import { accessTokenValidator, loginValidator, refreshTokenValidator, registerValidator } from '~/middlewares/users.middlewares'
+import { emailVerifyValidator, loginController, logoutController, registerController } from '~/controllers/users.controller'
+import { accessTokenValidator, emailTokenValidator, loginValidator, refreshTokenValidator, registerValidator } from '~/middlewares/users.middlewares'
 import { warpRequestHandler } from '~/utils/handlers'
 
 const usersRouter = Router()
@@ -31,4 +31,12 @@ usersRouter.post('/register', registerValidator, warpRequestHandler(registerCont
  * Body: {refresh_token:string}
  */
 usersRouter.post('/logout', accessTokenValidator,refreshTokenValidator, warpRequestHandler(logoutController))
+
+/**
+ * Description: Verify email user when user click on the link in email
+ * PATH: /verify-email
+ * METHOD: POST
+ * body: {refresh_token: string}
+ */
+usersRouter.post('/verify-email', emailTokenValidator, warpRequestHandler(emailVerifyValidator))
 export default usersRouter

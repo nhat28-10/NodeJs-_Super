@@ -14,16 +14,16 @@ export const validate = (validations: RunnableValidationChains<ValidationChain>)
       return next()
     }
     const errorsObject =  errors.mapped()
-    const entityError = new EntityError({errors: errorsObject})
-    // for (const key in errorsObject) {
-    //   const {msg} = errorsObject[key]
-    //   // Trả về lỗi không validate
-    //   if ( msg instanceof ErrorWithStatus && msg.status !== HTTP_STATUS.UNPROGRESSABLE_ENTITY) {
-    //     return next(msg)
-    //   }
-    //   entityError.errors[key] = msg
-    // }
-    
-    next(entityError)
+    const entityError = new EntityError({errors: {} })
+    for (const key in errorsObject) {
+      const {msg} = errorsObject[key]
+      if(msg instanceof ErrorWithStatus && msg.status !== HTTP_STATUS.UNPROGRESSABLE_ENTITY) {
+        return next(msg
+          
+        )
+      }
+      entityError.errors[key] = msg instanceof ErrorWithStatus ? msg.message : msg
+    }
+    return next(entityError)
   }
 }
