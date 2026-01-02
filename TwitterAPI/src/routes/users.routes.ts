@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { emailVerifyValidator, loginController, logoutController, registerController } from '~/controllers/users.controller'
+import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController } from '~/controllers/users.controller'
 import { accessTokenValidator, emailTokenValidator, loginValidator, refreshTokenValidator, registerValidator } from '~/middlewares/users.middlewares'
 import { warpRequestHandler } from '~/utils/handlers'
 
@@ -38,5 +38,13 @@ usersRouter.post('/logout', accessTokenValidator,refreshTokenValidator, warpRequ
  * METHOD: POST
  * body: {refresh_token: string}
  */
-usersRouter.post('/verify-email', emailTokenValidator, warpRequestHandler(emailVerifyValidator))
+usersRouter.post('/verify-email', emailTokenValidator, warpRequestHandler(verifyEmailController))
+/**
+ * Description: Resend verify email user
+ * PATH: /resend-verify-email
+ * METHOD:POST
+ * Header: {Authorization: Bearer <access_token>}
+ */
+usersRouter.post('/resend-verify-email', accessTokenValidator, warpRequestHandler(resendVerifyEmailController))
+
 export default usersRouter
