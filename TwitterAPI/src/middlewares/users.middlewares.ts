@@ -241,18 +241,18 @@ export const emailTokenValidator = validate(
             }
             try {
               const decoded_verify_email_token = await verifyToken({
-              token: value,
-              secretOrPublicKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string
-            })
+                token: value,
+                secretOrPublicKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string
+              })
 
-            req.decoded_verify_email_token = decoded_verify_email_token
+              req.decoded_verify_email_token = decoded_verify_email_token
             } catch (error) {
               throw new ErrorWithStatus({
                 message: capitalize((error as JsonWebTokenError).message),
                 status: HTTP_STATUS.UNAUTHORIZED
               })
             }
-            
+
             return true
           }
         }
@@ -260,4 +260,25 @@ export const emailTokenValidator = validate(
     },
     ['body']
   )
+)
+
+export const forgotPasswordValidator = validate(
+  checkSchema({
+    email: {
+      isEmail: {
+        errorMessage: USER_MESSAGE.EMAIL_IS_INVALID
+      },
+      trim: true,
+      custom: {
+        options: async (value, { req }) => {
+          const user = await databaseService.users.findOne({ email: value })
+          if (user === null) {
+            throw new Error(USER_MESSAGE.USER_NOT_FOUND)
+          }
+          req.user = user
+          return true
+        }
+      }
+    },
+  })
 )
