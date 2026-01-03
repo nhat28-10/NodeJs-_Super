@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController } from '~/controllers/users.controller'
+import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController } from '~/controllers/users.controller'
 import { accessTokenValidator, emailTokenValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, resetPasswordValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
 import { warpRequestHandler } from '~/utils/handlers'
 
@@ -70,4 +70,12 @@ usersRouter.post('/verify-forgot-password', verifyForgotPasswordTokenValidator, 
  * Body: {forgot_password_token: string,password:string, confirm_password:string}
  */
 usersRouter.post('/reset-password', resetPasswordValidator, warpRequestHandler(resetPasswordController))
+
+/**
+ * DESCRIPTION: Get user profile
+ * PATH: /my-profile
+ * METHOD: GET
+ * HEADER: {Authorization: Bearer <access_token>}
+ */
+usersRouter.get('/my-profile',accessTokenValidator,warpRequestHandler(getProfileController))
 export default usersRouter
