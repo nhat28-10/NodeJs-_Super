@@ -8,6 +8,7 @@ import { SignOptions } from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
 import { USER_MESSAGE } from '~/constants/messages'
 import { access } from 'fs'
+import { update } from 'lodash'
 class UsersService {
   private signAccessToken(user_id: string) {
     return signToken({
@@ -160,6 +161,23 @@ class UsersService {
     return {
       message: USER_MESSAGE.CHECK_EMAIL_TO_RESET_PASSWORD
     } 
+  }
+  async resetPassword(user_id:string, password:string) {
+    databaseService.users.updateOne(
+      {_id: new ObjectId(user_id)},
+        {
+          $set: {
+            forgot_password_token: '',
+            password: hashPassword(password),
+          },
+          $currentDate: {
+            updated_at: true
+          }
+        }
+      )
+      return {
+        message: USER_MESSAGE.RESET_PASSWORD_SUCCESS
+      }
   }
 }
 

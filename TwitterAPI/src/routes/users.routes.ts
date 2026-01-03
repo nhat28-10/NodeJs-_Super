@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController } from '~/controllers/users.controller'
-import { accessTokenValidator, emailTokenValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
+import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController } from '~/controllers/users.controller'
+import { accessTokenValidator, emailTokenValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, resetPasswordValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
 import { warpRequestHandler } from '~/utils/handlers'
 
 const usersRouter = Router()
@@ -62,4 +62,12 @@ usersRouter.post('/forgot-password', forgotPasswordValidator, warpRequestHandler
  * Body: {forgot_password_token: string}
  */
 usersRouter.post('/verify-forgot-password', verifyForgotPasswordTokenValidator, warpRequestHandler(verifyForgotPasswordController))
+
+/**
+ * DESCIPRTION: Reset password
+ * PATH: /reset-password
+ * METHOD: POST
+ * Body: {forgot_password_token: string,password:string, confirm_password:string}
+ */
+usersRouter.post('/reset-password', resetPasswordValidator, warpRequestHandler(resetPasswordController))
 export default usersRouter
