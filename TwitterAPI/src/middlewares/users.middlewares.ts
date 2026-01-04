@@ -10,6 +10,9 @@ import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/valdations'
 import { capitalize } from 'lodash'
 import { ObjectId } from 'mongodb'
+import { NextFunction, RequestHandler } from 'express'
+import { TokenPayload } from '~/models/requests/users.requests'
+import { UserVerifyStatus } from '~/constants/enum'
 
 const passwordSchema: ParamSchema = {
   notEmpty: {
@@ -288,12 +291,13 @@ export const emailTokenValidator = validate(
               })
             }
             try {
-              const decoded_verify_email_token = await verifyToken({
+              const decoded_email_verify_token = await verifyToken({
                 token: value,
                 secretOrPublicKey: process.env.JWT_SECRET_EMAIL_VERIFY_TOKEN as string
               })
 
-              req.decoded_verify_email_token = decoded_verify_email_token
+              req.decoded_email_verify_token = decoded_email_verify_token
+
             } catch (error) {
               throw new ErrorWithStatus({
                 message: capitalize((error as JsonWebTokenError).message),
@@ -343,3 +347,14 @@ export const resetPasswordValidator = validate(
     forgot_password_token: forgotPasswordTokenSchema
   },['body'])
 )
+
+export const verifiedUserValidator:RequestHandler = (req,res,next) => {
+  const { verify } = req.decoded_authorization as TokenPayload
+  if (verify !== UserVerifyStatus.Verified) {
+   return next( new ErrorWithStatus({
+      message: USER_MESSAGE.USER_NOT_VERIFIED,
+      status: HTTP_STATUS.FORBIDDEN
+    }))
+  }
+  next()
+}

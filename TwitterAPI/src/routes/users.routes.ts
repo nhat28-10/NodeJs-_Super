@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController } from '~/controllers/users.controller'
-import { accessTokenValidator, emailTokenValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, resetPasswordValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
+import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController, updateProfileController } from '~/controllers/users.controller'
+import { accessTokenValidator, emailTokenValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, resetPasswordValidator, verifiedUserValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
 import { warpRequestHandler } from '~/utils/handlers'
 
 const usersRouter = Router()
@@ -78,4 +78,14 @@ usersRouter.post('/reset-password', resetPasswordValidator, warpRequestHandler(r
  * HEADER: {Authorization: Bearer <access_token>}
  */
 usersRouter.get('/my-profile',accessTokenValidator,warpRequestHandler(getProfileController))
+
+/**
+ * DESCRIPTION: Update user profile
+ * PATH: /my-profile
+ * METHOD: PATCH
+ * HEADER: {Authorization: Bearer <access_token>}
+ * Body: User Schema
+ */
+usersRouter.patch('/my-profile',accessTokenValidator,verifiedUserValidator,warpRequestHandler(updateProfileController))
+
 export default usersRouter

@@ -13,7 +13,7 @@ import { UserVerifyStatus } from '~/constants/enum'
 export const loginController = async  (req:Request<ParamsDictionary, any, LoginRequestBody>, res: Response) => {
   const user = req.user as User
   const user_id = user._id as ObjectId
-  const result = await usersService.login(user_id.toString())
+  const result = await usersService.login({user_id: user_id.toString(), verify: user.verify})
   return res.json({
     message: USER_MESSAGE.LOGIN_SUCCESS,
     result
@@ -62,7 +62,7 @@ export const resendVerifyEmailController = async (req:Request, res:Response, nex
       message: USER_MESSAGE.USER_NOT_FOUND
     })
   }
-  if(user.verify_status === UserVerifyStatus.Verified) {
+  if(user.verify === UserVerifyStatus.Verified) {
     return res.json({
       message: USER_MESSAGE.EMAIL_VERIFIED
     })
@@ -72,8 +72,8 @@ export const resendVerifyEmailController = async (req:Request, res:Response, nex
 }
 
 export const forgotPasswordController = async (req:Request<ParamsDictionary, any, forgotPasswordReqBody>, res:Response, next: NextFunction) => {
-  const { _id } = req.user as User
-  const result = await usersService.forgotPassword((_id as ObjectId).toString())
+  const { _id, verify} = req.user as User
+  const result = await usersService.forgotPassword({user_id:(_id as ObjectId).toString(), verify})
   return res.json(result)
 }
 export const verifyForgotPasswordController = async (req:Request<ParamsDictionary, any, VerifyForgotPasswordReqBody>, res:Response, next: NextFunction) => {
@@ -95,5 +95,9 @@ export const getProfileController = async (req:Request, res: Response, next: Nex
     message:USER_MESSAGE.GET_PROFILE_SUCCESS,
     result: user
   })
+}
+
+export const updateProfileController = async (req: Request, res:Response, next:NextFunction) => {
+  return res.json({})
 }
 
