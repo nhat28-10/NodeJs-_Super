@@ -71,49 +71,90 @@ const confirmPasswordSchema: ParamSchema = {
   }
 }
 const forgotPasswordTokenSchema: ParamSchema = {
-      trim: true,
-      custom: {
-        options: async (value: string, { req }) => {
-          if (!value) {
-            throw new ErrorWithStatus({
-              message: USER_MESSAGE.FORGOT_PASSWORD_TOKEN_IS_REQUIRED,
-              status: HTTP_STATUS.UNAUTHORIZED
-            })
-          }
-          try {
-            const decoded_forgot_password_token = await verifyToken({
-              token: value,
-              secretOrPublicKey: process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string
-            })
-            const { user_id } = decoded_forgot_password_token
-            const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
-            if (user === null) {
-              throw new ErrorWithStatus({
-                message: USER_MESSAGE.USER_NOT_FOUND,
-                status: HTTP_STATUS.UNAUTHORIZED
-              })
-            }
-            if (user.forgot_password_token !== value) {
-              throw new ErrorWithStatus({
-                message: USER_MESSAGE.FORGOT_PASSWORD_TOKEN_IS_INVALID,
-                status: HTTP_STATUS.UNAUTHORIZED
-              })
-            }
-            req.decoded_forgot_password_token = decoded_forgot_password_token
-          } catch (error) {
-            // ✅ NẾU LÀ ErrorWithStatus → NÉM LẠI
-            if (error instanceof JsonWebTokenError) {
-              throw new ErrorWithStatus({
-                message: capitalize(error.message),
-                status: HTTP_STATUS.UNAUTHORIZED
-              })
-            }
-            throw error
-          }
-          return true
-        }
+  trim: true,
+  custom: {
+    options: async (value: string, { req }) => {
+      if (!value) {
+        throw new ErrorWithStatus({
+          message: USER_MESSAGE.FORGOT_PASSWORD_TOKEN_IS_REQUIRED,
+          status: HTTP_STATUS.UNAUTHORIZED
+        })
       }
+      try {
+        const decoded_forgot_password_token = await verifyToken({
+          token: value,
+          secretOrPublicKey: process.env.JWT_SECRET_FORGOT_PASSWORD_TOKEN as string
+        })
+        const { user_id } = decoded_forgot_password_token
+        const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+        if (user === null) {
+          throw new ErrorWithStatus({
+            message: USER_MESSAGE.USER_NOT_FOUND,
+            status: HTTP_STATUS.UNAUTHORIZED
+          })
+        }
+        if (user.forgot_password_token !== value) {
+          throw new ErrorWithStatus({
+            message: USER_MESSAGE.FORGOT_PASSWORD_TOKEN_IS_INVALID,
+            status: HTTP_STATUS.UNAUTHORIZED
+          })
+        }
+        req.decoded_forgot_password_token = decoded_forgot_password_token
+      } catch (error) {
+        // ✅ NẾU LÀ ErrorWithStatus → NÉM LẠI
+        if (error instanceof JsonWebTokenError) {
+          throw new ErrorWithStatus({
+            message: capitalize(error.message),
+            status: HTTP_STATUS.UNAUTHORIZED
+          })
+        }
+        throw error
+      }
+      return true
     }
+  }
+}
+const nameSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: USER_MESSAGE.NAME_IS_REQUIRED
+  },
+  isString: {
+    errorMessage: USER_MESSAGE.NAME_MUST_BE_STRING
+  },
+  isLength: {
+    options: {
+      min: 1,
+      max: 100
+    }
+  },
+  trim: true
+}
+
+const dateOfBirthSchema: ParamSchema = {
+  optional: true,
+  isISO8601: {
+    options: {
+      strict: true,
+      strictSeparator: true
+    },
+    errorMessage: USER_MESSAGE.DATE_OF_BIRTH_IS_ISO8601
+  }
+}
+const imageSchema: ParamSchema = {
+      
+      optional: true,
+      isString: {
+        errorMessage: USER_MESSAGE.IMAGE_MUST_BE_A_STRING
+      },
+      trim: true,
+      isLength: {
+        options: {
+          min: 1,
+          max: 400
+        },
+        errorMessage: USER_MESSAGE.IMAGE_LENGTH_MUST_BE_1_TO_400
+      }
+}
 export const loginValidator = validate(
   checkSchema({
     email: {
@@ -161,21 +202,7 @@ export const loginValidator = validate(
 
 export const registerValidator = validate(
   checkSchema({
-    name: {
-      notEmpty: {
-        errorMessage: USER_MESSAGE.NAME_IS_REQUIRED
-      },
-      isString: {
-        errorMessage: USER_MESSAGE.NAME_MUST_BE_STRING
-      },
-      isLength: {
-        options: {
-          min: 1,
-          max: 100
-        }
-      },
-      trim: true
-    },
+    name: nameSchema,
     email: {
       notEmpty: {
         errorMessage: USER_MESSAGE.EMAIL_IS_REQUIRED
@@ -196,16 +223,7 @@ export const registerValidator = validate(
     },
     password: passwordSchema,
     confirm_password: confirmPasswordSchema,
-    date_of_birth: {
-      optional: true,
-      isISO8601: {
-        options: {
-          strict: true,
-          strictSeparator: true
-        },
-        errorMessage: USER_MESSAGE.DATE_OF_BIRTH_IS_ISO8601
-      }
-    }
+    date_of_birth: dateOfBirthSchema
   }, ['body'])
 )
 export const accessTokenValidator = validate(
@@ -345,16 +363,92 @@ export const resetPasswordValidator = validate(
     password: passwordSchema,
     confirm_password: confirmPasswordSchema,
     forgot_password_token: forgotPasswordTokenSchema
-  },['body'])
+  }, ['body'])
 )
 
-export const verifiedUserValidator:RequestHandler = (req,res,next) => {
+export const verifiedUserValidator: RequestHandler = (req, res, next) => {
   const { verify } = req.decoded_authorization as TokenPayload
   if (verify !== UserVerifyStatus.Verified) {
-   return next( new ErrorWithStatus({
+    return next(new ErrorWithStatus({
       message: USER_MESSAGE.USER_NOT_VERIFIED,
       status: HTTP_STATUS.FORBIDDEN
     }))
   }
   next()
 }
+
+export const updateProfileValidator = validate(
+  checkSchema({
+    name: {
+      ...nameSchema,
+      optional: true,
+      notEmpty: undefined
+    },
+    date_of_birth: {
+      ...dateOfBirthSchema,
+      optional: true,
+    },
+    bio: {
+      
+      optional: true,
+      isString: {
+        errorMessage: USER_MESSAGE.BIO_MUST_BE_A_STRING
+      },
+       trim: true,
+      isLength: {
+        options: {
+          min: 1,
+          max: 200
+        },
+        errorMessage: USER_MESSAGE.BIO_LENGTH_MUST_BE_1_TO_200
+      },
+    },
+    location: {
+      
+      optional: true,
+      isString: {
+        errorMessage: USER_MESSAGE.LOCATION_MUST_BE_A_STRING
+      },
+      trim: true,
+      isLength: {
+        options: {
+          min: 1,
+          max: 200
+        },
+        errorMessage: USER_MESSAGE.LOCATION_LENGTH_MUST_BE_1_TO_200
+      }
+    },
+    website:{
+      
+      optional: true,
+      isString: {
+        errorMessage: USER_MESSAGE.WEBSITE_MUST_BE_A_STRING
+      },
+      trim: true,
+      isLength: {
+        options: {
+          min: 1,
+          max: 200
+        },
+        errorMessage: USER_MESSAGE.WEBSITE_LENGTH_MUST_BE_1_TO_200
+      }
+    },
+    username:{
+     
+      optional: true,
+      isString: {
+        errorMessage: USER_MESSAGE.USERNAME_MUST_BE_A_STRING
+      },
+      trim: true,
+      isLength: {
+        options: {
+          min: 1,
+          max: 50
+        },
+        errorMessage: USER_MESSAGE.USERNAME_LENGTH_MUST_BE_1_TO_50
+      }
+    },
+    avatar: imageSchema,
+    cover_photo:imageSchema
+  }, ['body'])
+)

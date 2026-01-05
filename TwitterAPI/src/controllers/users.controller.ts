@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import usersService from '~/services/users.service'
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
-import { forgotPasswordReqBody, LoginRequestBody, LogoutReqBody, RegisterRequest, ResetPasswordReqBody, TokenPayload, VerifyEmailReqBody, VerifyForgotPasswordReqBody } from '~/models/requests/users.requests'
+import { forgotPasswordReqBody, LoginRequestBody, LogoutReqBody, RegisterRequest, ResetPasswordReqBody, TokenPayload, UpdateProfileReqBody, VerifyEmailReqBody, VerifyForgotPasswordReqBody } from '~/models/requests/users.requests'
 import { ObjectId } from 'mongodb'
 import User from '~/models/schemas/Users.model'
 import { USER_MESSAGE } from '~/constants/messages'
@@ -9,6 +9,7 @@ import { ref } from 'process'
 import databaseService from '~/services/database.services'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { UserVerifyStatus } from '~/constants/enum'
+import { result } from 'lodash'
 
 export const loginController = async  (req:Request<ParamsDictionary, any, LoginRequestBody>, res: Response) => {
   const user = req.user as User
@@ -97,7 +98,13 @@ export const getProfileController = async (req:Request, res: Response, next: Nex
   })
 }
 
-export const updateProfileController = async (req: Request, res:Response, next:NextFunction) => {
-  return res.json({})
+export const updateProfileController = async (req: Request<ParamsDictionary, any, UpdateProfileReqBody>, res:Response, next:NextFunction) => {
+  const {user_id} = req.decoded_authorization as TokenPayload
+  const {body} = req
+  const user = await usersService.updateProfile(user_id,body)
+  return res.json({
+    message: USER_MESSAGE.UDPATE_PROFILE_SUCCESS,
+    result: user
+  })
 }
 
