@@ -9,7 +9,7 @@ import { ref } from 'process'
 import databaseService from '~/services/database.services'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { UserVerifyStatus } from '~/constants/enum'
-import { result } from 'lodash'
+import { pick, result } from 'lodash'
 
 export const loginController = async  (req:Request<ParamsDictionary, any, LoginRequestBody>, res: Response) => {
   const user = req.user as User

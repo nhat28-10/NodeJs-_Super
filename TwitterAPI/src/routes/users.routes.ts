@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController, updateProfileController } from '~/controllers/users.controller'
+import { filterMiddleware } from '~/middlewares/common.middlewares'
 import { accessTokenValidator, emailTokenValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, resetPasswordValidator, updateProfileValidator, verifiedUserValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
+import { UpdateProfileReqBody } from '~/models/requests/users.requests'
 import { warpRequestHandler } from '~/utils/handlers'
 
 const usersRouter = Router()
@@ -86,6 +88,12 @@ usersRouter.get('/my-profile',accessTokenValidator,warpRequestHandler(getProfile
  * HEADER: {Authorization: Bearer <access_token>}
  * Body: User Schema
  */
-usersRouter.patch('/my-profile',accessTokenValidator,verifiedUserValidator,updateProfileValidator,warpRequestHandler(updateProfileController))
+usersRouter.patch(
+  '/my-profile',
+  accessTokenValidator,
+  verifiedUserValidator,
+  updateProfileValidator,
+  filterMiddleware<UpdateProfileReqBody>(['name', 'date_of_birth', 'bio', 'location', 'website', 'avatar', 'username','cover_photo']),
+  warpRequestHandler(updateProfileController))
 
 export default usersRouter
