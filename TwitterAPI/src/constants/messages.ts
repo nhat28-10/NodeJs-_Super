@@ -47,6 +47,8 @@ export const USER_MESSAGE = {
   IMAGE_LENGTH_MUST_BE_1_TO_400: 'Imagr URL must be 1 to 400 characters',
   UDPATE_PROFILE_SUCCESS: 'Update profile success',
   FOLLOW_SUCCESS: 'Follow success',
-  INVALID_FOLLOWED_USER_ID: 'Invalid followed user id',
-  FOLLOWED: 'This user has been followed by you'
+  INVALID_USER_ID: 'Invalid followed user id',
+  FOLLOWED: 'This user has been followed by you',
+  UNFOLLOW_SUCCESS: 'Unfollow success',
+  ALREADY_UNFOLLOW: 'Already unfollow this user'
 } as const
