@@ -1,7 +1,7 @@
 import { Router } from 'express'
-import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController, updateProfileController } from '~/controllers/users.controller'
+import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController, updateProfileController, followController } from '~/controllers/users.controller'
 import { filterMiddleware } from '~/middlewares/common.middlewares'
-import { accessTokenValidator, emailTokenValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, resetPasswordValidator, updateProfileValidator, verifiedUserValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
+import { accessTokenValidator, emailTokenValidator, followValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, resetPasswordValidator, updateProfileValidator, verifiedUserValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
 import { UpdateProfileReqBody } from '~/models/requests/users.requests'
 import { warpRequestHandler } from '~/utils/handlers'
 
@@ -96,4 +96,16 @@ usersRouter.patch(
   filterMiddleware<UpdateProfileReqBody>(['name', 'date_of_birth', 'bio', 'location', 'website', 'avatar', 'username','cover_photo']),
   warpRequestHandler(updateProfileController))
 
+/**
+ * DESCRIPTION: User follow someone
+ * PATH: /follow
+ * METHOD: POST
+ * Headers: {Authorization: Bearer <access_token>}
+ * Body {followed_user_id: string}
+ */
+usersRouter.post('/follow',
+  accessTokenValidator,
+  verifiedUserValidator,
+  followValidator, 
+  warpRequestHandler(followController))
 export default usersRouter

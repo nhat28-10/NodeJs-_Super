@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import usersService from '~/services/users.service'
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
-import { forgotPasswordReqBody, LoginRequestBody, LogoutReqBody, RegisterRequest, ResetPasswordReqBody, TokenPayload, UpdateProfileReqBody, VerifyEmailReqBody, VerifyForgotPasswordReqBody } from '~/models/requests/users.requests'
+import { FollowReqBody, forgotPasswordReqBody, LoginRequestBody, LogoutReqBody, RegisterRequest, ResetPasswordReqBody, TokenPayload, UpdateProfileReqBody, VerifyEmailReqBody, VerifyForgotPasswordReqBody } from '~/models/requests/users.requests'
 import { ObjectId } from 'mongodb'
 import User from '~/models/schemas/Users.model'
 import { USER_MESSAGE } from '~/constants/messages'
@@ -106,5 +106,11 @@ export const updateProfileController = async (req: Request<ParamsDictionary, any
     message: USER_MESSAGE.UDPATE_PROFILE_SUCCESS,
     result: user
   })
+}
+export const followController = async (req: Request<ParamsDictionary, any, FollowReqBody>, res:Response, next:NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { followed_user_id } = req.body
+  const result = await usersService.follow(user_id,followed_user_id)
+  return res.json(result)
 }
 
