@@ -42,7 +42,7 @@ export const USER_MESSAGE = {
   WEBSITE_MUST_BE_A_STRING: 'Website URL must be a string',
   WEBSITE_LENGTH_MUST_BE_1_TO_200: 'Website URL must be 1 to 200 characters',
   USERNAME_MUST_BE_A_STRING: 'Username must be a string',
-  USERNAME_LENGTH_MUST_BE_1_TO_50: 'Username must be 1 to 200 characters',
+  USER_NAME_INVALID: 'Username must be 4 - 15 characters long and only contain only letters, numbers, underscores, not only numbers',
   IMAGE_MUST_BE_A_STRING: 'Image must be a string',
   IMAGE_LENGTH_MUST_BE_1_TO_400: 'Imagr URL must be 1 to 400 characters',
   UDPATE_PROFILE_SUCCESS: 'Update profile success',
@@ -50,5 +50,7 @@ export const USER_MESSAGE = {
   INVALID_USER_ID: 'Invalid followed user id',
   FOLLOWED: 'This user has been followed by you',
   UNFOLLOW_SUCCESS: 'Unfollow success',
-  ALREADY_UNFOLLOW: 'Already unfollow this user'
+  ALREADY_UNFOLLOW: 'Already unfollow this user',
+  USER_NAME_EXISTED: 'Username has been existed',
+  
 } as const
