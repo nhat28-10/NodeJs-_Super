@@ -253,6 +253,23 @@ class UsersService {
       message: USER_MESSAGE.UNFOLLOW_SUCCESS
     }
   }
+  async changePassword(user_id: string, new_password:string) {
+    await databaseService.users.updateOne(
+      {_id: new ObjectId(user_id)},
+      {
+        $set:{
+          password:hashPassword(new_password)
+        },
+        $currentDate:{
+          updated_at: true
+        }
+      }
+    )
+    await databaseService.refreshTokens.deleteMany({user_id: new Object(user_id)})
+    return {
+      message: USER_MESSAGE.CHANGE_PASSWORD_SUCCESS
+    }
+  }
 }
 
 

@@ -1,7 +1,7 @@
 import { Router } from 'express'
-import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController, updateProfileController, followController, unfollowController } from '~/controllers/users.controller'
+import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController, updateProfileController, followController, unfollowController, changePasswordController } from '~/controllers/users.controller'
 import { filterMiddleware } from '~/middlewares/common.middlewares'
-import { accessTokenValidator, emailTokenValidator, followValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, resetPasswordValidator, unfollowValidator, updateProfileValidator, verifiedUserValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
+import { accessTokenValidator, changePasswordValidator, emailTokenValidator, followValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, resetPasswordValidator, unfollowValidator, updateProfileValidator, verifiedUserValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
 import { UpdateProfileReqBody } from '~/models/requests/users.requests'
 import { warpRequestHandler } from '~/utils/handlers'
 
@@ -108,7 +108,7 @@ usersRouter.post('/follow',
   verifiedUserValidator,
   followValidator, 
   warpRequestHandler(followController))
-  /**
+/**
  * DESCRIPTION: User unfollow someone
  * PATH: /follow/User_id
  * METHOD: DELETE
@@ -120,5 +120,15 @@ usersRouter.delete('/follow/:user_id',
   verifiedUserValidator,
   unfollowValidator, 
   warpRequestHandler(unfollowController)
+)
+/**
+ * DESCRIPTION: User change password
+ * PATH: /change-password
+ * METHOD: PUT
+ * Headers: {Authorization: Bearer <access_token>}
+ * Body {current_password: string, password: string, confirm_password: string}
+ */
+usersRouter.put('/change-password',accessTokenValidator,verifiedUserValidator,changePasswordValidator,
+  warpRequestHandler(changePasswordController)
 )
 export default usersRouter

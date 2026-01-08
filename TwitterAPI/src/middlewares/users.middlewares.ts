@@ -1,4 +1,3 @@
-
 import { check, checkSchema, ParamSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import HTTP_STATUS from '~/constants/httpStatus'
@@ -14,6 +13,7 @@ import { NextFunction, RequestHandler } from 'express'
 import { TokenPayload } from '~/models/requests/users.requests'
 import { UserVerifyStatus } from '~/constants/enum'
 import { REGEX_USERNAME } from '~/constants/regex'
+import { hashPassword } from '~/utils/crypto'
 
 const passwordSchema: ParamSchema = {
   notEmpty: {
@@ -490,4 +490,33 @@ export const unfollowValidator = validate(
   checkSchema({
     user_id: userIdSchema
   },['params'])
+)
+export const changePasswordValidator = validate(
+  checkSchema({
+    current_password: {
+      ...passwordSchema,
+      custom: {
+        options: async (value:string, {req}) => {
+          const { user_id } = (req as Request).decoded_authorization as TokenPayload
+          const user = await databaseService.users.findOne({ _id: new ObjectId(user_id)})
+          if (!user) {
+            throw new ErrorWithStatus({
+              message: USER_MESSAGE.USER_NOT_FOUND,
+              status: HTTP_STATUS.NOT_FOUND
+            })
+          }
+          const { password } = user
+          const isMatch = hashPassword(value) === password
+          if (!isMatch) {
+            throw new ErrorWithStatus({
+              message: USER_MESSAGE.CURRENT_PASSWORD_NOT_MATCH,
+              status: HTTP_STATUS.UNAUTHORIZED
+            })
+          }
+        }
+      }
+    },
+    password: passwordSchema,
+    confirm_password: confirmPasswordSchema
+  })
 )

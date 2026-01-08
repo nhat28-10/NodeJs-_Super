@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import usersService from '~/services/users.service'
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
-import { FollowReqBody, forgotPasswordReqBody, LoginRequestBody, LogoutReqBody, RegisterRequest, ResetPasswordReqBody, TokenPayload, UnfollowReqParams, UpdateProfileReqBody, VerifyEmailReqBody, VerifyForgotPasswordReqBody } from '~/models/requests/users.requests'
+import { ChangePasswordReqBody, FollowReqBody, forgotPasswordReqBody, LoginRequestBody, LogoutReqBody, RegisterRequest, ResetPasswordReqBody, TokenPayload, UnfollowReqParams, UpdateProfileReqBody, VerifyEmailReqBody, VerifyForgotPasswordReqBody } from '~/models/requests/users.requests'
 import { ObjectId } from 'mongodb'
 import User from '~/models/schemas/Users.model'
 import { USER_MESSAGE } from '~/constants/messages'
@@ -121,3 +121,9 @@ export const unfollowController = async (req: Request<UnfollowReqParams>, res:Re
   return res.json(result)
 }
 
+export const changePasswordController = async (req: Request<ParamsDictionary, any, ChangePasswordReqBody>,res:Response,next:NextFunction) => {
+  const {user_id} = req.decoded_authorization as TokenPayload
+  const {password} = req.body
+  const result = await usersService.changePassword(user_id, password)
+  return res.json(result)
+}
