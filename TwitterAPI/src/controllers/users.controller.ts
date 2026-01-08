@@ -127,3 +127,11 @@ export const changePasswordController = async (req: Request<ParamsDictionary, an
   const result = await usersService.changePassword(user_id, password)
   return res.json(result)
 }
+
+export const oauthController = async (req:Request, res: Response) => {
+  const {code} = req.query
+  await usersService.oauth(code as string)
+  return res.json({
+    message: USER_MESSAGE.LOGIN_SUCCESS,
+  })
+}

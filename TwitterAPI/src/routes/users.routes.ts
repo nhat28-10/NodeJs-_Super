@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController, updateProfileController, followController, unfollowController, changePasswordController } from '~/controllers/users.controller'
+import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController, updateProfileController, followController, unfollowController, changePasswordController, oauthController } from '~/controllers/users.controller'
 import { filterMiddleware } from '~/middlewares/common.middlewares'
 import { accessTokenValidator, changePasswordValidator, emailTokenValidator, followValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, resetPasswordValidator, unfollowValidator, updateProfileValidator, verifiedUserValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
 import { UpdateProfileReqBody } from '~/models/requests/users.requests'
@@ -18,6 +18,13 @@ usersRouter.use((req, res, next) => {
  * Body: {email:string, password:string}
  */
 usersRouter.post('/login', loginValidator, warpRequestHandler(loginController))
+/**
+ * Description. Oauth with Google
+ * PATH: /login
+ * METHOD: GET
+ * Query: {code: string}
+ */
+usersRouter.get('/oauth/google', warpRequestHandler(oauthController))
 /**
  * Description. Register a new user
  * PATH: /register

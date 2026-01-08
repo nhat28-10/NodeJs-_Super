@@ -10,6 +10,7 @@ import { ObjectId } from 'mongodb'
 import { USER_MESSAGE } from '~/constants/messages'
 import { access } from 'fs'
 import { update } from 'lodash'
+import axios from 'axios'
 import Follower from '~/models/schemas/Followers.schemas'
 class UsersService {
   private signAccessToken({ user_id, verify }: { user_id: string, verify: UserVerifyStatus }) {
@@ -70,6 +71,21 @@ class UsersService {
       }
     })
   }
+  private async getOauthGoogleToken(code: string) {
+    const body = new URLSearchParams({
+  code,
+  client_id: process.env.GOOGLE_CLIENT_ID!,
+  client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+  redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+  grant_type: 'authorization_code'
+})
+    const {data} = await axios.post('https://oauth2.googleapis.com/token',body, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
+    return data
+  }
   async register(payload: RegisterRequest) {
     const user_id = new ObjectId()
     const email_verify_token = await this.signEmailVerifyToken({ user_id: user_id.toString(), verify: UserVerifyStatus.Unverified })
@@ -109,6 +125,11 @@ class UsersService {
       access_token,
       refresh_token
     }
+  }
+  
+  async oauth(code: string) {
+    const data = await this.getOauthGoogleToken(code)
+    console.log(data)
   }
   async logout(refresh_token: string) {
     await databaseService.refreshTokens.deleteOne({ token: refresh_token })
