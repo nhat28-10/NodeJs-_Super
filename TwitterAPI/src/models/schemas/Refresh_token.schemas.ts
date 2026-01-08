@@ -1,7 +1,8 @@
 import { UserVerifyStatus } from "~/constants/enum"
+import { ObjectId } from "mongodb"
 
-export default class Refresh_token {
-  user_id: string
+export default class RefreshToken {
+  user_id: ObjectId | string
   token: string
   verify: UserVerifyStatus
   created_at: Date
@@ -13,7 +14,7 @@ export default class Refresh_token {
     verify,
     updated_at
   }: {
-    user_id: string
+    user_id: ObjectId | string
     token: string
     verify: UserVerifyStatus
     updated_at?: Date

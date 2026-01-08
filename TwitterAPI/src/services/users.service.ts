@@ -1,5 +1,6 @@
 import User from '~/models/schemas/Users.model'
 import databaseService from './database.services'
+import RefreshToken from '../models/schemas/Refresh_token.schemas'
 import { RegisterRequest, UpdateProfileReqBody } from '~/models/requests/users.requests'
 import { hashPassword } from '~/utils/crypto'
 import { signToken, verifyToken } from '~/utils/jwt'
@@ -130,6 +131,9 @@ class UsersService {
     )
     ])
     const [access_token, refresh_token] = token
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({user_id: new ObjectId(user_id), token:refresh_token, verify: UserVerifyStatus.Verified})
+    )
     return {
       access_token,
       refresh_token
