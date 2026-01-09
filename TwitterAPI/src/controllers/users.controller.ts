@@ -10,6 +10,9 @@ import databaseService from '~/services/database.services'
 import HTTP_STATUS from '~/constants/httpStatus'
 import { UserVerifyStatus } from '~/constants/enum'
 import { pick, result } from 'lodash'
+import { access } from 'fs'
+import { config } from 'dotenv'
+config()
 
 export const loginController = async  (req:Request<ParamsDictionary, any, LoginRequestBody>, res: Response) => {
   const user = req.user as User
@@ -130,8 +133,9 @@ export const changePasswordController = async (req: Request<ParamsDictionary, an
 
 export const oauthController = async (req:Request, res: Response) => {
   const {code} = req.query
-  await usersService.oauth(code as string)
-  return res.json({
-    message: USER_MESSAGE.LOGIN_SUCCESS,
-  })
+  const result = await usersService.oauth(code as string)
+  const urlRedirect = `${process.env.CLIENT_REDIRECT_CALLBACK}?access_token=${result.access_token}
+  &refresh_token=${result.refresh_token}&new_user=${result.newUser}`
+  console.log(urlRedirect)
+  return res.redirect(urlRedirect)
 }
