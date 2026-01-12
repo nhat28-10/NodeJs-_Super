@@ -4,7 +4,9 @@ import { UPLOAD_DIR } from "~/constants/dir"
 import { getNameFromFullName, handleUploadSingleImage } from "~/utils/file"
 import path from "path"
 import fs from 'fs'
-
+import { isProduction } from "~/constants/config"
+import { config } from "dotenv"
+config()
 class MediasSerivce {
   async handleUploadSingleImage(req: Request) {
     const file = await handleUploadSingleImage(req)
@@ -13,7 +15,9 @@ class MediasSerivce {
     console.log(newPath)
      await sharp(file.filepath).jpeg().toFile(newPath)
      fs.unlinkSync(file.filepath)
-    return `http://localhost:3000/uploads/${newName}.jpg`
+    return isProduction ? 
+    `${process.env.HOST}/medias/${newName}.jpg` : 
+    `http://localhost:${process.env.PORT}/medias/${newName}.jpg`
   }
 }
 
