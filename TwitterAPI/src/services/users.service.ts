@@ -141,12 +141,15 @@ class UsersService {
     const decoded = await verifyToken({ token: refresh_token, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string })
 
     // 🔥 LƯU REFRESH TOKEN VÀO DATABASE
-    await databaseService.refreshTokens.insertOne({
-      token: refresh_token,
-      user_id: new ObjectId(user_id),
-      iat: decoded.iat,
-      exp: decoded.exp
-    })
+    await databaseService.refreshTokens.insertOne(
+      new RefreshToken({
+        token: refresh_token,
+        user_id: new ObjectId(user_id),
+        verify: decoded.verify,
+        iat: decoded.iat!,
+        exp: decoded.exp!
+      })
+    )
 
     return {
       access_token,
@@ -172,7 +175,8 @@ class UsersService {
         user_id: user._id.toString(),
         verify: user.verify
       })
-      await databaseService.refreshTokens.insertOne(new RefreshToken({user_id: user._id, token: refresh_token, verify: user.verify}) )
+      const decoded = await verifyToken({ token: refresh_token, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string })
+      await databaseService.refreshTokens.insertOne(new RefreshToken({user_id: user._id, token: refresh_token, verify: user.verify, iat: decoded.iat!, exp: decoded.exp!}) )
       return {access_token, refresh_token, newUser:0, verify: user.verify}
     } else {
       const password = Math.random().toString(36).substring(2,15)
@@ -207,8 +211,9 @@ class UsersService {
     )
     ])
     const [access_token, refresh_token] = token
+    const decoded = await verifyToken({ token: refresh_token, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string })
     await databaseService.refreshTokens.insertOne(
-      new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token, verify: UserVerifyStatus.Verified })
+      new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token, verify: UserVerifyStatus.Verified, iat: decoded.iat!, exp: decoded.exp! })
     )
     return {
       access_token,

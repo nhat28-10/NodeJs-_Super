@@ -497,7 +497,7 @@ export const changePasswordValidator = validate(
       ...passwordSchema,
       custom: {
         options: async (value:string, {req}) => {
-          const { user_id } = (req as Request).decoded_authorization as TokenPayload
+          const { user_id } = req.decoded_authorization as TokenPayload
           const user = await databaseService.users.findOne({ _id: new ObjectId(user_id)})
           if (!user) {
             throw new ErrorWithStatus({

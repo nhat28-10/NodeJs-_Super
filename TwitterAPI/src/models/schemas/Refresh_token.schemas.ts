@@ -7,17 +7,23 @@ export default class RefreshToken {
   verify: UserVerifyStatus
   created_at: Date
   updated_at: Date
+  iat: number
+  exp: number
 
   constructor({
     user_id,
     token,
     verify,
-    updated_at
+    updated_at,
+    iat,
+    exp
   }: {
     user_id: ObjectId | string
     token: string
     verify: UserVerifyStatus
     updated_at?: Date
+    iat: number
+    exp: number
   }) {
     const date = new Date()
     this.user_id = user_id
@@ -26,5 +32,7 @@ export default class RefreshToken {
     this.created_at = new Date()
     this.created_at = date
     this.updated_at = updated_at || date
+    this.iat = iat
+    this.exp = exp
   }
 }

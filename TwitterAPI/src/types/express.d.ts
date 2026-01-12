@@ -1,4 +1,3 @@
-import { Request } from "express";
 import { TokenPayload } from "~/models/requests/users.requests";
 import User from "~/models/schemas/Users.model";
 
