@@ -7,6 +7,7 @@ import { initFolder } from './utils/file'
 import { config } from 'dotenv'
 import { isProduction } from './constants/config'
 import { UPLOAD_DIR } from './constants/dir'
+import staticRouter from './routes/static.routes'
 
 config()
 databaseService.connect()
@@ -17,7 +18,8 @@ initFolder()
 app.use(express.json())
 app.use('/users', usersRouter)
 app.use('/medias', mediasRouter)
-app.use('/static',express.static(UPLOAD_DIR))
+app.use('/static',staticRouter)
+// app.use('/static',express.static(UPLOAD_DIR))
 
 app.use(defaultErrorHandler)
 app.listen(port, () => {
