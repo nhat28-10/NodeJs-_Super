@@ -9,6 +9,7 @@ const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR:500,
   NOT_FOUND: 404,
   FORBIDDEN: 403,
+  PARTICAL_CONTENT: 206,
 } as const
 
 export default HTTP_STATUS
