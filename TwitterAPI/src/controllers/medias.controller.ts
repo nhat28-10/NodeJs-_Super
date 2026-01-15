@@ -7,7 +7,7 @@ import path from "path"
 import { UPLOAD_DIR, UPLOAD_VIDEO_DIR } from "~/constants/dir"
 import HTTP_STATUS from "~/constants/httpStatus"
 import { USER_MESSAGE } from "~/constants/messages"
-import mediasService from "~/services/medias.service"
+import mediasService from "~/services/medias.services"
 
 
 export const uploadImageController = async (req:Request, res: Response, next: NextFunction) => {

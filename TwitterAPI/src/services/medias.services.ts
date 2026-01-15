@@ -1,6 +1,6 @@
 import { Request } from "express"
 import sharp from "sharp"
-import { UPLOAD_DIR, UPLOAD_VIDEO_DIR} from "~/constants/dir"
+import { UPLOAD_DIR, UPLOAD_TEMP_DIR, UPLOAD_VIDEO_DIR} from "~/constants/dir"
 import { getNameFromFullName, handleUploadImage, handleUploadVideo } from "~/utils/file"
 import path from "path"
 import fs from 'fs'
@@ -14,7 +14,7 @@ class MediasSerivce {
     const files = await handleUploadImage(req)
     const result:Media[] = await Promise.all(files.map(async file => {
       const newName = getNameFromFullName(file.newFilename)
-      const newPath = path.resolve(UPLOAD_DIR, `${newName}.jpg`)
+      const newPath = path.resolve(UPLOAD_TEMP_DIR, `${newName}.jpg`)
       console.log(newPath)
       await sharp(file.filepath).jpeg().toFile(newPath)
       fs.unlinkSync(file.filepath)
