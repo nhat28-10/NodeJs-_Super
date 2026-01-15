@@ -28,21 +28,14 @@ class MediasSerivce {
     return result
   }
   async handleUploadVideo(req: Request) {
-    const file = await handleUploadVideo(req)
-    const result:Media[] = await Promise.all(file.map(async file => {
-      const newName = getNameFromFullName(file.newFilename)
-      const newPath = path.resolve(UPLOAD_VIDEO_DIR, `${newName}.mp4`)
-      console.log(newPath)
-      await fs.promises.rename(file.filepath, newPath)
-
-      return {
+    const files = await handleUploadVideo(req)
+    const {newFilename} = files[0]
+     return {
         url: isProduction ?
-          `${process.env.HOST}/static/video-stream/${newName}.mp4` :
-          `http://localhost:${process.env.PORT}/static/video-stream/${newName}.mp4`,
+          `${process.env.HOST}/static/video-stream/${newFilename}.mp4` :
+          `http://localhost:${process.env.PORT}/static/video-stream/${newFilename}.mp4`,
         type: MediaType.Video
       }
-    }))
-    return result
   }
 }
 
