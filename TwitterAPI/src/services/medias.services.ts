@@ -49,7 +49,7 @@ class MediasSerivce {
         url: isProduction ?
           `${process.env.HOST}/static/video-hls/${newName}` :
           `http://localhost:${process.env.PORT}/static/video-stream/${newName}`,
-        type: MediaType.Video
+        type: MediaType.HLS
       }
     }))
     return result
