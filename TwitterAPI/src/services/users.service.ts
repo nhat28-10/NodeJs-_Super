@@ -88,30 +88,30 @@ class UsersService {
       }
     })
     return data as {
-      access_token :string
+      access_token: string
       id_token: string
     }
   }
-  private async getGoogleUserInfo(access_token:string, id_token:string) {
-    const {data} = await axios.get(
+  private async getGoogleUserInfo(access_token: string, id_token: string) {
+    const { data } = await axios.get(
       'https://www.googleapis.com/oauth2/v1/userinfo',
       {
         params: {
           access_token,
           alt: 'json'
         },
-        headers:{
+        headers: {
           Authorization: `Bearer ${id_token}`
         }
       })
-      return data as {
-        id: string,
-        email: string,
-        verified_email: string,
-        name:string,
-        given_name:string,
-        picture:string,
-      }
+    return data as {
+      id: string,
+      email: string,
+      verified_email: string,
+      name: string,
+      given_name: string,
+      picture: string,
+    }
   }
   async register(payload: RegisterRequest) {
     const user_id = new ObjectId()
@@ -129,14 +129,14 @@ class UsersService {
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({ user_id: user_id.toString(), verify: UserVerifyStatus.Unverified })
     return { access_token, refresh_token }
   }
-    async refreshToken({user_id, verify,refresh_token}:{user_id:string, verify: UserVerifyStatus,refresh_token:string}) {
-    const [new_access_token,new_refresh_token] = await Promise.all([
-      this.signAccessToken({user_id, verify}),
-      this.signRefreshToken({user_id, verify}),
-      databaseService.refreshTokens.deleteOne({token: refresh_token})
+  async refreshToken({ user_id, verify, refresh_token }: { user_id: string, verify: UserVerifyStatus, refresh_token: string }) {
+    const [new_access_token, new_refresh_token] = await Promise.all([
+      this.signAccessToken({ user_id, verify }),
+      this.signRefreshToken({ user_id, verify }),
+      databaseService.refreshTokens.deleteOne({ token: refresh_token })
     ])
     const decoded = await verifyToken({ token: new_refresh_token, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string })
-    await databaseService.refreshTokens.insertOne(new RefreshToken({user_id: new ObjectId(user_id), token: new_refresh_token, verify, iat: decoded.iat!, exp: decoded.exp!}))
+    await databaseService.refreshTokens.insertOne(new RefreshToken({ user_id: new ObjectId(user_id), token: new_refresh_token, verify, iat: decoded.iat!, exp: decoded.exp! }))
     return {
       access_token: new_access_token,
       refresh_token: new_refresh_token
@@ -171,28 +171,28 @@ class UsersService {
   }
 
   async oauth(code: string) {
-    const {access_token, id_token} = await this.getOauthGoogleToken(code)
+    const { access_token, id_token } = await this.getOauthGoogleToken(code)
     const userInfo = await this.getGoogleUserInfo(access_token, id_token)
     console.log(userInfo)
-    if(!userInfo.verified_email) {
+    if (!userInfo.verified_email) {
       throw new ErrorWithStatus({
         message: USER_MESSAGE.GMAIL_NOT_VERIFIED,
         status: HTTP_STATUS.BAD_REQUEST
       })
     }
     // Kiem tra email da duoc dky chua
-    const user = await databaseService.users.findOne({email: userInfo.email})
+    const user = await databaseService.users.findOne({ email: userInfo.email })
     // Neu ton tai thi cho login vao he thong
-    if(user) {
+    if (user) {
       const [access_token, refresh_token] = await this.signAccessAndRefreshToken({
         user_id: user._id.toString(),
         verify: user.verify
       })
       const decoded = await verifyToken({ token: refresh_token, secretOrPublicKey: process.env.JWT_SECRET_REFRESH_TOKEN as string })
-      await databaseService.refreshTokens.insertOne(new RefreshToken({user_id: user._id, token: refresh_token, verify: user.verify, iat: decoded.iat!, exp: decoded.exp!}) )
-      return {access_token, refresh_token, newUser:0, verify: user.verify}
+      await databaseService.refreshTokens.insertOne(new RefreshToken({ user_id: user._id, token: refresh_token, verify: user.verify, iat: decoded.iat!, exp: decoded.exp! }))
+      return { access_token, refresh_token, newUser: 0, verify: user.verify }
     } else {
-      const password = Math.random().toString(36).substring(2,15)
+      const password = Math.random().toString(36).substring(2, 15)
       const data = await this.register({
         email: userInfo.email,
         name: userInfo.name,
@@ -200,7 +200,7 @@ class UsersService {
         password,
         confirm_password: password
       })
-      return {...data, newUser:1, verify: UserVerifyStatus.Unverified}
+      return { ...data, newUser: 1, verify: UserVerifyStatus.Unverified }
     }
   }
   async logout(refresh_token: string) {

@@ -9,7 +9,6 @@ import HTTP_STATUS from "~/constants/httpStatus"
 import { USER_MESSAGE } from "~/constants/messages"
 import mediasService from "~/services/medias.services"
 
-
 export const uploadImageController = async (req:Request, res: Response, next: NextFunction) => {
   
   const url = await mediasService.handleUploadImage(req)
@@ -31,6 +30,13 @@ export const serveImageController = (req:Request, res:Response, next:NextFunctio
 }
 export const uploadVideoController = async (req:Request, res:Response, next:NextFunction) => {
   const url = await mediasService.handleUploadVideo(req)
+  return res.json({
+    message:USER_MESSAGE.UPLOAD_VIDEO_SUCCESS,
+    result: url
+  })
+}
+export const uploadVideoHLSController = async (req:Request, res:Response, next:NextFunction) => {
+  const url = await mediasService.handleUploadVideoHLS(req)
   return res.json({
     message:USER_MESSAGE.UPLOAD_VIDEO_SUCCESS,
     result: url
