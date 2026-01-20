@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController, updateProfileController, followController, unfollowController, changePasswordController, oauthController } from '~/controllers/users.controller'
+import { verifyEmailController, loginController, logoutController, registerController, resendVerifyEmailController, forgotPasswordController, verifyForgotPasswordController, resetPasswordController, getProfileController, updateProfileController, followController, unfollowController, changePasswordController, oauthController, refreshTokenController } from '~/controllers/users.controller'
 import { filterMiddleware } from '~/middlewares/common.middlewares'
 import { accessTokenValidator, changePasswordValidator, emailTokenValidator, followValidator, forgotPasswordValidator, loginValidator, refreshTokenValidator, registerValidator, resetPasswordValidator, unfollowValidator, updateProfileValidator, verifiedUserValidator, verifyForgotPasswordTokenValidator } from '~/middlewares/users.middlewares'
 import { UpdateProfileReqBody } from '~/models/requests/users.requests'
@@ -40,6 +40,13 @@ usersRouter.post('/register', registerValidator, warpRequestHandler(registerCont
  * Body: {refresh_token:string}
  */
 usersRouter.post('/logout', accessTokenValidator,refreshTokenValidator, warpRequestHandler(logoutController))
+/**
+ * Description: Refresh token
+ * PATH: /refresh-token
+ * METHOD: POST
+ * Body: {refresh_token:string}
+ */
+usersRouter.post('/refresh-token',refreshTokenValidator, warpRequestHandler(refreshTokenController))
 
 /**
  * Description: Verify email user when user click on the link in email

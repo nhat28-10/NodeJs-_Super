@@ -57,4 +57,5 @@ export const USER_MESSAGE = {
   GMAIL_NOT_VERIFIED:'Your gmail is not verified',
   UPLOAD_IMAGE_SUCCESS:'Upload image success',
   UPLOAD_VIDEO_SUCCESS: 'Upload video success',
+  REFRESH_TOKEN_SUCCESS: 'Refresh token success'
 } as const
