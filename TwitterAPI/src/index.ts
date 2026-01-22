@@ -8,6 +8,7 @@ import { config } from 'dotenv'
 import { isProduction } from './constants/config'
 import { UPLOAD_DIR, UPLOAD_VIDEO_DIR } from './constants/dir'
 import staticRouter from './routes/static.routes'
+import cors from 'cors'
 
 config()
 databaseService.connect()
@@ -15,6 +16,7 @@ const app = express()
 const port = process.env.PORT || 3000
 
 initFolder()
+app.use(cors())
 app.use(express.json())
 app.use('/users', usersRouter)
 app.use('/medias', mediasRouter)
