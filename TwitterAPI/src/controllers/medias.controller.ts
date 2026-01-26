@@ -95,3 +95,12 @@ console.log('exists:', fs.existsSync(videoPath))
   const videoSteams = fs.createReadStream(videoPath, {start, end})
   videoSteams.pipe(res)
 }
+export const videoStatusController = async (req:Request, res:Response,next:NextFunction)=> {
+  const {id} = req.params
+  const result = await mediasService.getVideoStatus(id as string)
+  console.log(result)
+  res.json({
+    message:USER_MESSAGE.FETCH_VIDEO_STATUS_SUCCESS,
+    result: result
+  })
+}
