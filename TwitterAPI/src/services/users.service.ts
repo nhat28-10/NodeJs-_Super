@@ -113,18 +113,28 @@ class UsersService {
       picture: string,
     }
   }
+  private generateUsernameFromEmail(email:string) {
+    return email
+      .split('@')[0] // lấy trước phần tử @
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '')// bỏ khoảng trắng
+      .replace(/[^a-z0-9._]/g, '') // bỏ ký tự đặc biệt
+  }
   async register(payload: RegisterRequest) {
     const user_id = new ObjectId()
     const email_verify_token = await this.signEmailVerifyToken({ user_id: user_id.toString(), verify: UserVerifyStatus.Unverified })
-    await databaseService.users.insertOne(
-      new User({
-        ...payload,
-        _id: user_id,
-        email_verify_token,
-        date_of_birth: new Date(payload.date_of_birth),
-        password: hashPassword(payload.password)
-      })
-    )
+    
+    const username = this.generateUsernameFromEmail(payload.email)
+    const userDoc = new User({
+      ...payload,
+      _id: user_id,
+      username,
+      email_verify_token,
+      date_of_birth: new Date(payload.date_of_birth),
+      password: hashPassword(payload.password)
+    })
+    await databaseService.users.insertOne(userDoc)
     console.log('email_verify_token: ', email_verify_token)
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({ user_id: user_id.toString(), verify: UserVerifyStatus.Unverified })
     return { access_token, refresh_token }
