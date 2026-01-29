@@ -1,38 +1,29 @@
 import { UserVerifyStatus } from "~/constants/enum"
 import { ObjectId } from "mongodb"
 
-export default class RefreshToken {
-  user_id: ObjectId | string
+interface RefreshTokenType{
+  _id?: ObjectId
+  user_id: ObjectId
   token: string
-  verify: UserVerifyStatus
-  created_at: Date
-  updated_at: Date
+  created_at?:Date
   iat: number
   exp: number
+  
+}
 
-  constructor({
-    user_id,
-    token,
-    verify,
-    updated_at,
-    iat,
-    exp
-  }: {
-    user_id: ObjectId | string
-    token: string
-    verify: UserVerifyStatus
-    updated_at?: Date
-    iat: number
-    exp: number
-  }) {
-    const date = new Date()
-    this.user_id = user_id
-    this.verify = verify
+export default class RefreshToken {
+  _id?: ObjectId
+  token: string
+  created_at:Date
+  user_id:ObjectId
+  iat: Date
+  exp: Date
+  constructor({_id,token,created_at,user_id,iat,exp}: RefreshTokenType) {
+    this._id = _id
     this.token = token
-    this.created_at = new Date()
-    this.created_at = date
-    this.updated_at = updated_at || date
-    this.iat = iat
-    this.exp = exp
+    this.created_at = created_at || new Date()
+    this.user_id = user_id
+    this.iat = new Date(iat * 1000)
+    this.exp = new Date(exp * 1000)
   }
 }
