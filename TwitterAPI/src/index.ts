@@ -1,11 +1,12 @@
-import express, {Request, Response, NextFunction} from 'express'
-import usersRouter from './routes/users.routes'
+import express from 'express'
+
 import databaseService from './services/database.services'
 import { defaultErrorHandler } from './middlewares/error.middlewares'
 import mediasRouter from './routes/media.routes'
+import usersRouter from './routes/users.routes'
+import tweetRouter from './routes/tweet.routes'
 import { initFolder } from './utils/file'
 import { config } from 'dotenv'
-import { isProduction } from './constants/config'
 import { UPLOAD_DIR, UPLOAD_VIDEO_DIR } from './constants/dir'
 import staticRouter from './routes/static.routes'
 import cors from 'cors'
@@ -28,6 +29,7 @@ app.use(express.json())
 app.use('/users', usersRouter)
 app.use('/medias', mediasRouter)
 app.use('/static',staticRouter)
+app.use('/tweets',tweetRouter)
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
 
 app.use(defaultErrorHandler)

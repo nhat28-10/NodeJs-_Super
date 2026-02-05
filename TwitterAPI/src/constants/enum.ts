@@ -26,7 +26,7 @@ export enum TweetType {
   Tweet,
   Retweet,
   Comment,
-  QuoteComment
+  QuoteTweet
 }
 
 export enum TweetAudience {
