@@ -72,3 +72,7 @@ export const TWEET_MGS = {
   MENTIONS_MUST_BE_AN_ARRAY_OF_USERID:'Mention must be an array of user id',
   MEDIA_MUST_BE_AN_ARRAY_OF_MEDIA_OBJECT: 'Media must be an array of media object'
 } as const 
+
+export const BOOKMARK = {
+  BOOKMARK_SUCCESS:'Bookmark success'
+} as const

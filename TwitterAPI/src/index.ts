@@ -10,6 +10,7 @@ import { config } from 'dotenv'
 import { UPLOAD_DIR, UPLOAD_VIDEO_DIR } from './constants/dir'
 import staticRouter from './routes/static.routes'
 import cors from 'cors'
+import bookmarkRouter from './routes/bookmark.routes'
 
 config()
 databaseService.connect().then(
@@ -30,6 +31,7 @@ app.use('/users', usersRouter)
 app.use('/medias', mediasRouter)
 app.use('/static',staticRouter)
 app.use('/tweets',tweetRouter)
+app.use('/bookmarks',bookmarkRouter)
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
 
 app.use(defaultErrorHandler)
