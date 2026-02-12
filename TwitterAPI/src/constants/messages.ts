@@ -74,5 +74,6 @@ export const TWEET_MGS = {
 } as const 
 
 export const BOOKMARK = {
-  BOOKMARK_SUCCESS:'Bookmark success'
+  BOOKMARK_SUCCESS:'Bookmark success',
+  UNBOOKMARK_SUCCESS:'Unbookmark success'
 } as const
