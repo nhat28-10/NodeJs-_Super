@@ -249,7 +249,7 @@ class UsersService {
       [{
         $set: {
           email_verify_token: '',
-          verify_status: UserVerifyStatus.Verified,
+          verify: UserVerifyStatus.Verified,
           updated_at: '$$NOW'
         },
       }]
