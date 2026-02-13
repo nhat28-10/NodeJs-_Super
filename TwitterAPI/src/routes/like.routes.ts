@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { likeTweetController, unlikeTweetController } from "~/controllers/like.controller";
+import { tweetIdValidator } from "~/middlewares/tweet.middlwares";
 import { accessTokenValidator, verifiedUserValidator } from "~/middlewares/users.middlewares";
 import { warpRequestHandler } from "~/utils/handlers";
 
@@ -11,7 +12,7 @@ const likeRouter = Router()
  * BODY: {tweet_id: string}
  * Header: {Authorization: Bearer <access_token>}
  */
-likeRouter.post('',accessTokenValidator,verifiedUserValidator,warpRequestHandler(likeTweetController))
+likeRouter.post('',accessTokenValidator,verifiedUserValidator,tweetIdValidator,warpRequestHandler(likeTweetController))
 /**
  * Description: Book mark
  * PATH: /tweets/:tweet_id
@@ -19,5 +20,5 @@ likeRouter.post('',accessTokenValidator,verifiedUserValidator,warpRequestHandler
  * BODY: {tweet_id: string}
  * Header: {Authorization: Bearer <access_token>}
  */
-likeRouter.delete('/tweets/:tweet_id',accessTokenValidator,verifiedUserValidator,warpRequestHandler(unlikeTweetController))
+likeRouter.delete('/tweets/:tweet_id',accessTokenValidator,verifiedUserValidator,tweetIdValidator,warpRequestHandler(unlikeTweetController))
 export default likeRouter
