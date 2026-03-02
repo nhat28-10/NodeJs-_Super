@@ -9,11 +9,12 @@ import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/valdations'
 import { capitalize } from 'lodash'
 import { ObjectId } from 'mongodb'
-import { NextFunction, RequestHandler } from 'express'
+import { NextFunction, RequestHandler,Request,Response } from 'express'
 import { TokenPayload } from '~/models/requests/users.requests'
 import { UserVerifyStatus } from '~/constants/enum'
 import { REGEX_USERNAME } from '~/constants/regex'
 import { hashPassword } from '~/utils/crypto'
+
 
 const passwordSchema: ParamSchema = {
   notEmpty: {
@@ -520,3 +521,12 @@ export const changePasswordValidator = validate(
     confirm_password: confirmPasswordSchema
   })
 )
+export const isUserLoggedInValidator = (middleware: (req:Request, res:Response, next: NextFunction) => void) => {
+  return (req:Request, res:Response, next: NextFunction) => {
+    if(req.headers.authorization) {
+      return middleware(req,res,next)
+    }
+    next()
+  }
+}
+
