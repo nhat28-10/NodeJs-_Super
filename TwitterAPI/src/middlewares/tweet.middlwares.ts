@@ -29,20 +29,25 @@ export const createTweetValidator = validate(
         errorMessage: TWEET_MGS.INVALID_AUDIENCE
       }
     },
-    parent_id : {
-      custom: {
-        options: (value, {req}) => {
-          const type = req.body.type as TweetType
-          if([TweetType.Retweet, TweetType.Comment, TweetType.QuoteTweet].includes(type) && ObjectId.isValid(value)) {
-            throw new Error(TWEET_MGS.PARENT_ID)
-          }
-          if (type == TweetType.Tweet && value != null) {
-            throw new Error(TWEET_MGS.PARENT_ID_NULL)
-          }
-          return true
+    parent_id: {
+  custom: {
+    options: (value, { req }) => {
+      const type = req.body.type as TweetType
+
+      if ([TweetType.Retweet, TweetType.Comment, TweetType.QuoteTweet].includes(type)) {
+        if (!value || !ObjectId.isValid(value)) {
+          throw new Error(TWEET_MGS.PARENT_ID) // "Parent id must be a valid tweet id"
         }
       }
-    },
+
+      if (type === TweetType.Tweet && value != null) {
+        throw new Error(TWEET_MGS.PARENT_ID_NULL)
+      }
+
+      return true
+    }
+  }
+},
     content : {
       isString: true,
       custom: {
