@@ -4,7 +4,10 @@ import { ObjectId, WithId } from "mongodb";
 import Tweet from "~/models/schemas/Tweet.schema";
 import Hashtag from "~/models/schemas/Hashtags.schemas";
 
-
+type IncreaseViewResult = {
+  guest_views: number
+  user_views: number
+}
 class TweetServices {
   async checkAndCreateHashtag(hashtags: string[]) {
   const results = await Promise.all(
@@ -37,6 +40,33 @@ class TweetServices {
     const tweet = await databaseService.tweets.findOne({_id: result.insertedId})
     return tweet;
   }
+ async increaseView(tweet_id: string, user_id?: string): Promise<IncreaseViewResult> {
+  const inc = user_id ? { user_views: 1 } : { guest_views: 1 }
+
+  const result = await databaseService.tweets.findOneAndUpdate(
+    { _id: new ObjectId(tweet_id) },
+    {
+      $inc: inc
+    },
+    {
+      returnDocument: 'after',
+      projection: {
+        _id: 0,
+        guest_views: 1,
+        user_views: 1
+      }
+    }
+  )
+
+  if (!result) {
+    throw new Error('Tweet not found')
+  }
+
+  return {
+    guest_views: result.guest_views ?? 0,
+    user_views: result.user_views ?? 0
+  }
+}
 }
 
 const tweetServices = new TweetServices();

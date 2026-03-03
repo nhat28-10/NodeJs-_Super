@@ -218,11 +218,6 @@ export const tweetIdValidator = validate(
                       }
                     }
                   },
-                  'views': {
-                    '$add': [
-                      '$user_views', '$guest_views'
-                    ]
-                  }
                 }
               }, {
                 '$project': {
