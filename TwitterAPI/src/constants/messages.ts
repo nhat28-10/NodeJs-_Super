@@ -62,7 +62,7 @@ export const USER_MESSAGE = {
 } as const
 
 export const TWEET_MGS = {
-  INVALID_TYPE: 'Invalid type',
+  INVALID_TYPE: 'Invalid tweet type',
   INVALID_AUDIENCE: 'Invalid audience',
   PARENT_ID: 'Parent id must be a valid tweet id',
   PARENT_ID_NULL: 'Parent id must be null',

@@ -275,4 +275,38 @@ export const audienceValidator = warpRequestHandler(async (req: Request, res: Re
 
   next()
 })
+export const getTweetChildrenValidator = validate(
+  checkSchema({
+    tweet_type: {
+      isIn: {
+        options: [tweetTypes],
+        errorMessage: TWEET_MGS.INVALID_TYPE
+      }
+    },
+    limit: {
+      isNumeric:true,
+      custom: {
+        options: async (value,{req}) => {
+          const num = Number(value)
+          if(num > 100 || num < 1) {
+            throw new Error('Limit is min at 1 and max at 100')
+          }
+          return true
+        }
+      }
+    },
+    page: {
+      isNumeric:true,
+      custom: {
+        options: async (value,{req}) => {
+          const num = Number(value)
+          if(num < 1) {
+            throw new Error('Page must be greater than 0')
+          }
+          return true
+        }
+      }
+    }
+  }, ['query'])
+)
 
