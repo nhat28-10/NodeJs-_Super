@@ -4,6 +4,7 @@ import { ObjectId, WithId } from "mongodb";
 import Tweet from "~/models/schemas/Tweet.schema";
 import Hashtag from "~/models/schemas/Hashtags.schemas";
 import { TweetType } from "~/constants/enum";
+import { count } from "console";
 
 type IncreaseViewResult = {
   guest_views: number
@@ -233,7 +234,7 @@ class TweetServices {
     }).toArray()
     const ids = followed_user_ids.map((item) => item.followed_user_id)
     ids.push(user_id_obj)
-    const tweets = await databaseService.tweets.aggregate(
+    const [tweets, total] = await Promise.all([databaseService.tweets.aggregate(
       [
         {
           '$match': {
@@ -270,12 +271,12 @@ class TweetServices {
               }
             ]
           }
-        }, 
+        },
         {
           '$skip': limit * (page - 1)
         }, {
           '$limit': limit
-        },{
+        }, {
           '$lookup': {
             'from': 'hashtags',
             'localField': 'hashtags',
@@ -386,10 +387,74 @@ class TweetServices {
           }
         }
       ]
-    ).toArray()
-    return tweets
+    ).toArray(),
+      databaseService.tweets.aggregate([
+      {
+        '$match': {
+          'user_id': {
+            '$in': ids
+          }
+        }
+      }, {
+        '$lookup': {
+          'from': 'users',
+          'localField': 'user_id',
+          'foreignField': '_id',
+          'as': 'user'
+        }
+      }, {
+        '$unwind': {
+          'path': '$user'
+        }
+      }, {
+        '$match': {
+          '$or': [
+            {
+              'audience': 0
+            }, {
+              '$and': [
+                {
+                  'audience': 1
+                }, {
+                  'user.twitter_circle': {
+                    '$in': [user_id_obj]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }, {
+        '$count': 'total'
+      }
+    ]).toArray()
+  ])
+
+    const tweet_ids = tweets.map((tweet) => tweet._id as ObjectId)
+    const date = new Date()
+    await databaseService.tweets.updateMany(
+      {
+        _id: {$in: tweet_ids}
+      },
+      {
+        $inc: { user_views: 1 },
+        $set: {
+          updated_at: date
+        }
+      }
+    )
+
+      tweets.forEach(tweet => {
+        tweet.updated_at = date
+        tweet.user_views += 1
+      })
+    return {
+      tweets,
+      total: total[0].total
+    }
   }
 }
+
 
 const tweetServices = new TweetServices();
 export default tweetServices

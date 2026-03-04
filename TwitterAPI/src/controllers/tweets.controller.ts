@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express"
 import { ParamsDictionary } from "express-serve-static-core"
 import { body } from "express-validator"
 import { TweetType } from "~/constants/enum"
+import { TWEET_MGS } from "~/constants/messages"
 import { Pagination, TweetParam, TweetQuery, TweetReqBody } from "~/models/requests/tweets.request"
 import { TokenPayload } from "~/models/requests/users.requests"
 import tweetServices from "~/services/tweets.services"
@@ -62,7 +63,12 @@ export const getNewFeedsController = async (req: Request<ParamsDictionary, any ,
     page,
   })
   return res.json({
-    message:'Get new feeds successfully',
-    result:result
+    message:TWEET_MGS.GET_NEW_FEEDS_SUCCESS,
+    result:{
+      tweets: result.tweets,
+      limit,
+      page,
+      total_page: Math.ceil(result.total/limit)
+    }
   })
 }

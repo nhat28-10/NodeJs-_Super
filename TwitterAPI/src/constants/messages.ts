@@ -74,6 +74,7 @@ export const TWEET_MGS = {
   INVALID_TWEET_ID: 'Invalid tweet id',
   TWEET_NOT_FOUND: 'Tweet not found',
   TWEET_IS_NOT_PUBLIC: 'This tweet is not public',
+  GET_NEW_FEEDS_SUCCESS: 'Get new feeds successfully'
 } as const 
 
 export const BOOKMARK = {
