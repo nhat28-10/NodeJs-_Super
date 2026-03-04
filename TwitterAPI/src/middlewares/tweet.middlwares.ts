@@ -283,6 +283,10 @@ export const getTweetChildrenValidator = validate(
         errorMessage: TWEET_MGS.INVALID_TYPE
       }
     },
+  }, ['query'])
+)
+export const paginationValidator = validate(
+  checkSchema({
     limit: {
       isNumeric:true,
       custom: {
@@ -307,6 +311,6 @@ export const getTweetChildrenValidator = validate(
         }
       }
     }
-  }, ['query'])
+  },['query'])
 )
 

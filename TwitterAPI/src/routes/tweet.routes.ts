@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { createTweetController, getTweetChildrenController, getTweetController } from "~/controllers/tweets.controller";
-import { audienceValidator, createTweetValidator, getTweetChildrenValidator, tweetIdValidator } from "~/middlewares/tweet.middlwares";
+import { createTweetController, getNewFeedsController, getTweetChildrenController, getTweetController } from "~/controllers/tweets.controller";
+import { audienceValidator, createTweetValidator, getTweetChildrenValidator, paginationValidator, tweetIdValidator } from "~/middlewares/tweet.middlwares";
 import { accessTokenValidator, isUserLoggedInValidator, verifiedUserValidator } from "~/middlewares/users.middlewares";
 import { warpRequestHandler } from "~/utils/handlers";
 
@@ -13,34 +13,48 @@ const tweetRouter = Router();
  * body: TweetReqBody
  */
 tweetRouter.post("/",
-  accessTokenValidator, 
+  accessTokenValidator,
   verifiedUserValidator,
-  createTweetValidator, 
+  createTweetValidator,
   warpRequestHandler(createTweetController))
-  /**
- * Description: Get tweet detail
- * Path: /:tweet_id
- * Method: GET
- * Header:{ Authorization?:Bearer<access_token> }
- */
+/**
+* Description: Get tweet detail
+* Path: /:tweet_id
+* Method: GET
+* Header:{ Authorization?:Bearer<access_token> }
+*/
 tweetRouter.get("/:tweet_id",
   tweetIdValidator,
   isUserLoggedInValidator(accessTokenValidator),
   isUserLoggedInValidator(verifiedUserValidator),
   audienceValidator,
   warpRequestHandler(getTweetController))
-    /**
- * Description: Get Tweet Children
- * Path: /:tweet_id/children
- * Method: GET
- * Header:{ Authorization?:Bearer<access_token> }
- * Query: {limit:number, page: number, tweet_type:TweetType}
- */
+/**
+* Description: Get Tweet Children
+* Path: /:tweet_id/children
+* Method: GET
+* Header:{ Authorization?:Bearer<access_token> }
+* Query: {limit:number, page: number, tweet_type:TweetType}
+*/
 tweetRouter.get("/:tweet_id/children",
   tweetIdValidator,
+  paginationValidator,
   getTweetChildrenValidator,
   isUserLoggedInValidator(accessTokenValidator),
   isUserLoggedInValidator(verifiedUserValidator),
   audienceValidator,
   warpRequestHandler(getTweetChildrenController))
+
+/**
+* Description: Get new feeds 
+* Path: /new-feeds
+* Method: GET
+* Header:{ Authorization?:Bearer<access_token> }
+* Query: {limit:number, page: number, tweet_type:TweetType}
+*/
+tweetRouter.get("/",
+  paginationValidator,
+  accessTokenValidator,
+  verifiedUserValidator,
+  warpRequestHandler(getNewFeedsController))
 export default tweetRouter;
