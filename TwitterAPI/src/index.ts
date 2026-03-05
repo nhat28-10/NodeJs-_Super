@@ -12,6 +12,7 @@ import staticRouter from './routes/static.routes'
 import cors from 'cors'
 import bookmarkRouter from './routes/bookmark.routes'
 import likeRouter from './routes/like.routes'
+import searchRouter from './routes/search.routes'
 
 config()
 databaseService.connect().then(
@@ -34,6 +35,7 @@ app.use('/static',staticRouter)
 app.use('/tweets',tweetRouter)
 app.use('/bookmarks',bookmarkRouter)
 app.use('/likes',likeRouter)
+app.use('/search',searchRouter)
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
 
 app.use(defaultErrorHandler)
