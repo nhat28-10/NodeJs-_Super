@@ -9,13 +9,15 @@ class SearchService {
     page,
     content,
     user_id,
-    media_type
+    media_type,
+    people_follow
   }: {
     limit: number
     page: number
     content: string
     user_id?: string
-    media_type: MediaTypeQuery
+    media_type?: MediaTypeQuery
+    people_follow?: string
   }) {
     const skip = limit * (page - 1)
     const audienceMatch = user_id
@@ -36,21 +38,39 @@ class SearchService {
       }
     const conditions: any[] = [
       {
-        $text:{
-          $search:content
+        $text: {
+          $search: content
         }
       },
       audienceMatch
     ]
-    if(media_type === MediaTypeQuery.Image) {
+    if (media_type === MediaTypeQuery.Image) {
       conditions.push({
-        'medias.type':MediaType.Image
+        'medias.type': MediaType.Image
       })
-    } 
-    if(media_type === MediaTypeQuery.Video) {
+    }
+    if (media_type === MediaTypeQuery.Video) {
       conditions.push({
-        'medias.type':{
-          $in:[MediaType.Video,MediaType.HLS]
+        'medias.type': {
+          $in: [MediaType.Video, MediaType.HLS]
+        }
+      })
+    }
+    if (people_follow && people_follow === '1') {
+      const user_id_obj = new ObjectId(user_id)
+      const followed_user_ids = await databaseService.followers.find({
+        user_id: user_id_obj
+      }, {
+        projection: {
+          followed_user_id: 1,
+          _id: 0
+        }
+      }).toArray()
+      const ids = followed_user_ids.map((item) => item.followed_user_id)
+      ids.push(user_id_obj)
+      conditions.push({
+        user_id : {
+          $in:ids
         }
       })
     }
