@@ -1,7 +1,7 @@
 import { SearchQuery } from "~/models/requests/search.request"
 import databaseService from "./database.services"
 import { ObjectId } from "mongodb"
-import { MediaType, MediaTypeQuery, TweetType } from "~/constants/enum"
+import { MediaType, MediaTypeQuery, PeopleFollow, TweetType } from "~/constants/enum"
 
 class SearchService {
   async search({
@@ -17,7 +17,7 @@ class SearchService {
     content: string
     user_id?: string
     media_type?: MediaTypeQuery
-    people_follow?: string
+    people_follow?: PeopleFollow
   }) {
     const skip = limit * (page - 1)
     const audienceMatch = user_id
@@ -56,7 +56,7 @@ class SearchService {
         }
       })
     }
-    if (people_follow && people_follow === '1') {
+    if (people_follow && people_follow === PeopleFollow.Following) {
       const user_id_obj = new ObjectId(user_id)
       const followed_user_ids = await databaseService.followers.find({
         user_id: user_id_obj
