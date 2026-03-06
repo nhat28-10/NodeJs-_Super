@@ -1,23 +1,23 @@
 import { SearchQuery } from "~/models/requests/search.request"
 import databaseService from "./database.services"
 import { ObjectId } from "mongodb"
-import { TweetType } from "~/constants/enum"
+import { MediaType, MediaTypeQuery, TweetType } from "~/constants/enum"
 
 class SearchService {
   async search({
     limit,
     page,
     content,
-    user_id
+    user_id,
+    media_type
   }: {
     limit: number
     page: number
     content: string
     user_id?: string
+    media_type: MediaTypeQuery
   }) {
-
     const skip = limit * (page - 1)
-
     const audienceMatch = user_id
       ? {
         $or: [
@@ -34,17 +34,29 @@ class SearchService {
           { audience: 1 }
         ]
       }
-
+    const conditions: any[] = [
+      {
+        $text:{
+          $search:content
+        }
+      },
+      audienceMatch
+    ]
+    if(media_type === MediaTypeQuery.Image) {
+      conditions.push({
+        'medias.type':MediaType.Image
+      })
+    } 
+    if(media_type === MediaTypeQuery.Video) {
+      conditions.push({
+        'medias.type':{
+          $in:[MediaType.Video,MediaType.HLS]
+        }
+      })
+    }
     const matchStage = {
       $match: {
-        $and: [
-          {
-            $text: {
-              $search: content
-            }
-          },
-          audienceMatch
-        ]
+        $and: conditions
       }
     }
 

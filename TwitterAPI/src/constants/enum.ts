@@ -33,3 +33,7 @@ export enum TweetAudience {
   Everyone,
   TweetCircle
 }
+export enum MediaTypeQuery {
+  Image = 'image',
+  Video = 'video'
+}
