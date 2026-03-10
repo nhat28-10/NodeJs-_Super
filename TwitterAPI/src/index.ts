@@ -34,24 +34,43 @@ app.use(cors())
 app.use(express.json())
 app.use('/users', usersRouter)
 app.use('/medias', mediasRouter)
-app.use('/static',staticRouter)
-app.use('/tweets',tweetRouter)
-app.use('/bookmarks',bookmarkRouter)
-app.use('/likes',likeRouter)
-app.use('/search',searchRouter)
+app.use('/static', staticRouter)
+app.use('/tweets', tweetRouter)
+app.use('/bookmarks', bookmarkRouter)
+app.use('/likes', likeRouter)
+app.use('/search', searchRouter)
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
 
 const io = new Server(httpServer, {
-  cors:{
-    origin:'*'
+  cors: {
+    origin: '*'
   }
 })
+
+const users: {
+  [key: string]: {
+    socket_id: string
+  }
+} = {}
 io.on("connection", (socket) => {
   console.log(`user ${socket.id} connected`)
-
+  const user_id = socket.handshake.auth._id
+  users[user_id] = {
+    socket_id: socket.id
+  }
+  console.log(users)
+  socket.on('private message',(data) => {
+    const receiver_socket_id = users[data.to].socket_id
+    socket.to(receiver_socket_id).emit('receive private message', {
+      content: data.content,
+      from: user_id
+    })
+  })
   socket.on("disconnect", () => {
+    delete users[user_id]
     console.log(`user ${socket.id} disconnected`)
   })
+
 })
 
 app.use(defaultErrorHandler)
