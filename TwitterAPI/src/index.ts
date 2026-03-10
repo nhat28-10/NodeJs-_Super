@@ -16,6 +16,8 @@ import searchRouter from './routes/search.routes'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import Conversation from './models/schemas/Conversation.schemas'
+import conversationRouter from './routes/conversation.routes'
+import { ObjectId } from 'mongodb'
 config()
 databaseService.connect().then(
   () => {
@@ -40,6 +42,7 @@ app.use('/tweets', tweetRouter)
 app.use('/bookmarks', bookmarkRouter)
 app.use('/likes', likeRouter)
 app.use('/search', searchRouter)
+app.use('/conversation',conversationRouter)
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
 
 const io = new Server(httpServer, {
@@ -66,8 +69,8 @@ io.on("connection", (socket) => {
       return
     }
     await databaseService.conversation.insertOne(new Conversation({
-      sender_id: data.from,
-      receiver_id: data.to,
+      sender_id: new ObjectId(data.from),
+      receiver_id: new ObjectId(data.to),
       content: data.content
     }))
     socket.to(receiver_socket_id).emit('receive private message', {
