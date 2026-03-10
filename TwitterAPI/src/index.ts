@@ -15,6 +15,7 @@ import likeRouter from './routes/like.routes'
 import searchRouter from './routes/search.routes'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
+import Conversation from './models/schemas/Conversation.schemas'
 config()
 databaseService.connect().then(
   () => {
@@ -59,12 +60,21 @@ io.on("connection", (socket) => {
     socket_id: socket.id
   }
   console.log(users)
-  socket.on('private message',(data) => {
+  socket.on('private message', async (data) => {
     const receiver_socket_id = users[data.to].socket_id
+    if (!receiver_socket_id) {
+      return
+    }
+    await databaseService.conversation.insertOne(new Conversation({
+      sender_id: data.from,
+      receiver_id: data.to,
+      content: data.content
+    }))
     socket.to(receiver_socket_id).emit('receive private message', {
       content: data.content,
       from: user_id
     })
+
   })
   socket.on("disconnect", () => {
     delete users[user_id]

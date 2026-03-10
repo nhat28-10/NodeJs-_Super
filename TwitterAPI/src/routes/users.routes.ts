@@ -93,7 +93,7 @@ usersRouter.post('/reset-password', resetPasswordValidator, warpRequestHandler(r
  * METHOD: GET
  * HEADER: {Authorization: Bearer <access_token>}
  */
-usersRouter.get('/my-profile',accessTokenValidator,warpRequestHandler(getProfileController))
+usersRouter.get('/me',accessTokenValidator,warpRequestHandler(getProfileController))
 
 /**
  * DESCRIPTION: Update user profile
