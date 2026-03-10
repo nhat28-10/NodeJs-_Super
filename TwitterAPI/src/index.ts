@@ -13,7 +13,8 @@ import cors from 'cors'
 import bookmarkRouter from './routes/bookmark.routes'
 import likeRouter from './routes/like.routes'
 import searchRouter from './routes/search.routes'
-
+import { createServer } from 'http'
+import { Server } from 'socket.io'
 config()
 databaseService.connect().then(
   () => {
@@ -25,6 +26,7 @@ databaseService.connect().then(
   }
 )
 const app = express()
+const httpServer = createServer(app);
 const port = process.env.PORT || 3000
 
 initFolder()
@@ -39,7 +41,20 @@ app.use('/likes',likeRouter)
 app.use('/search',searchRouter)
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
 
+const io = new Server(httpServer, {
+  cors:{
+    origin:'*'
+  }
+})
+io.on("connection", (socket) => {
+  console.log(`user ${socket.id} connected`)
+
+  socket.on("disconnect", () => {
+    console.log(`user ${socket.id} disconnected`)
+  })
+})
+
 app.use(defaultErrorHandler)
-app.listen(port, () => {
+httpServer.listen(port, () => {
   console.log(`Example app listen on port ${port}`)
 })
