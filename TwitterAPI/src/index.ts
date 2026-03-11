@@ -18,6 +18,13 @@ import { Server } from 'socket.io'
 import Conversation from './models/schemas/Conversation.schemas'
 import conversationRouter from './routes/conversation.routes'
 import { ObjectId } from 'mongodb'
+import { access } from 'fs'
+import { verifyAccessToken } from './utils/common'
+import { UserVerifyStatus } from './constants/enum'
+import { TokenPayload } from './models/requests/users.requests'
+import { ErrorWithStatus } from './models/Errors'
+import { USER_MESSAGE } from './constants/messages'
+import HTTP_STATUS from './constants/httpStatus'
 config()
 databaseService.connect().then(
   () => {
@@ -42,7 +49,7 @@ app.use('/tweets', tweetRouter)
 app.use('/bookmarks', bookmarkRouter)
 app.use('/likes', likeRouter)
 app.use('/search', searchRouter)
-app.use('/conversations',conversationRouter)
+app.use('/conversations', conversationRouter)
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
 
 const io = new Server(httpServer, {
@@ -56,6 +63,29 @@ const users: {
     socket_id: string
   }
 } = {}
+io.use(async (socket, next) => {
+  try {
+    const { Authorization } = socket.handshake.auth
+    const access_token = Authorization?.split(' ')[1]
+    console.log("token:", access_token)
+    if (!access_token) {
+      return next(new Error('No token'))
+    }
+
+    const decoded_authorization = await verifyAccessToken(access_token)
+
+
+    const { verify } = decoded_authorization as TokenPayload
+
+    if (verify !== UserVerifyStatus.Verified) {
+      return next(new Error('User not verified'))
+    }
+
+    next()
+  } catch (error) {
+    next(new Error('Unauthorized'))
+  }
+})
 io.on("connection", (socket) => {
   console.log(`user ${socket.id} connected`)
   const user_id = socket.handshake.auth._id
@@ -64,11 +94,12 @@ io.on("connection", (socket) => {
   }
   console.log(users)
   socket.on('send_message', async (data) => {
-    const {receiver_id,sender_id,content} = data.payload
-    const receiver_socket_id = users[receiver_id].socket_id
-    if (!receiver_socket_id) {
+    const { receiver_id, sender_id, content } = data.payload
+    const receiver_socket = users[receiver_id]
+    if (!receiver_socket) {
       return
     }
+    const receiver_socket_id = receiver_socket.socket_id
     const conversation = new Conversation({
       sender_id: new ObjectId(sender_id),
       receiver_id: new ObjectId(receiver_id),
@@ -77,9 +108,9 @@ io.on("connection", (socket) => {
     const result = await databaseService.conversation.insertOne(conversation)
     conversation._id = result.insertedId
     socket.to(receiver_socket_id).emit('receive_message', {
-      payload:conversation,
+      payload: conversation,
     })
-    
+
   })
   socket.on("disconnect", () => {
     delete users[user_id]
@@ -88,7 +119,7 @@ io.on("connection", (socket) => {
 
 })
 
-app.use(defaultErrorHandler)  
+app.use(defaultErrorHandler)
 httpServer.listen(port, () => {
   console.log(`Example app listen on port ${port}`)
 })
