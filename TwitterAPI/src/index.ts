@@ -88,7 +88,7 @@ io.on("connection", (socket) => {
 
 })
 
-app.use(defaultErrorHandler)
+app.use(defaultErrorHandler)  
 httpServer.listen(port, () => {
   console.log(`Example app listen on port ${port}`)
 })
