@@ -42,7 +42,7 @@ app.use('/tweets', tweetRouter)
 app.use('/bookmarks', bookmarkRouter)
 app.use('/likes', likeRouter)
 app.use('/search', searchRouter)
-app.use('/conversation',conversationRouter)
+app.use('/conversations',conversationRouter)
 app.use('/static/video', express.static(UPLOAD_VIDEO_DIR))
 
 const io = new Server(httpServer, {
@@ -63,21 +63,23 @@ io.on("connection", (socket) => {
     socket_id: socket.id
   }
   console.log(users)
-  socket.on('private message', async (data) => {
-    const receiver_socket_id = users[data.to].socket_id
+  socket.on('send_message', async (data) => {
+    const {receiver_id,sender_id,content} = data.payload
+    const receiver_socket_id = users[receiver_id].socket_id
     if (!receiver_socket_id) {
       return
     }
-    await databaseService.conversation.insertOne(new Conversation({
-      sender_id: new ObjectId(data.from),
-      receiver_id: new ObjectId(data.to),
-      content: data.content
-    }))
-    socket.to(receiver_socket_id).emit('receive private message', {
-      content: data.content,
-      from: user_id
+    const conversation = new Conversation({
+      sender_id: new ObjectId(sender_id),
+      receiver_id: new ObjectId(receiver_id),
+      content: content
     })
-
+    const result = await databaseService.conversation.insertOne(conversation)
+    conversation._id = result.insertedId
+    socket.to(receiver_socket_id).emit('receive_message', {
+      payload:conversation,
+    })
+    
   })
   socket.on("disconnect", () => {
     delete users[user_id]
