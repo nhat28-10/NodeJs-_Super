@@ -69,6 +69,12 @@ class DatabaseService {
       this.tweets.createIndex({content: 'text'}, {default_language: 'none'})
     }
   }
+  async indexConversation() {
+    const exists = await this.conversation.indexExists(['sender_1_receiver_id_1_created_at_1'])
+    if (!exists) {
+      this.conversation.createIndex({sender:1,receiver_id:1,created_at:1})
+    }
+  }
   get users(): Collection<User> {
     return this.db.collection(process.env.DB_USERS_COLLECTION as string)
   }
