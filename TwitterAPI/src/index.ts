@@ -80,19 +80,37 @@ io.use(async (socket, next) => {
     if (verify !== UserVerifyStatus.Verified) {
       return next(new Error('User not verified'))
     }
-
+    socket.handshake.auth.access_token = access_token
+    socket.handshake.auth.decoded_authorization = decoded_authorization 
     next()
   } catch (error) {
-    next(new Error('Unauthorized'))
+    next({
+      message:'Unauthorized',
+      name:'UnauthorizedError',
+      data:error
+    })
   }
 })
 io.on("connection", (socket) => {
   console.log(`user ${socket.id} connected`)
-  const user_id = socket.handshake.auth._id
+  const {user_id }= socket.handshake.auth.decoded_authorization as TokenPayload
   users[user_id] = {
     socket_id: socket.id
   }
-  console.log(users)
+  socket.use( async (packet,next) => {
+     const {access_token} = socket.handshake.auth
+     try {
+      await verifyAccessToken(access_token)
+      next()
+     } catch (error) {
+      next(new Error('Unauthorized'))
+     }
+  })
+  socket.on('error',(error) => {
+    if(error.message === 'Unauthorized') {
+      socket.disconnect()
+    }
+  })
   socket.on('send_message', async (data) => {
     const { receiver_id, sender_id, content } = data.payload
     const receiver_socket = users[receiver_id]
