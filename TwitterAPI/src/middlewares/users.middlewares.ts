@@ -17,6 +17,7 @@ import { hashPassword } from '~/utils/crypto'
 import { verifyAccessToken } from '~/utils/common'
 
 
+
 const passwordSchema: ParamSchema = {
   notEmpty: {
     errorMessage: USER_MESSAGE.PASSWORD_IS_REQUIRED
@@ -193,6 +194,11 @@ export const loginValidator = validate(
           if (user === null) {
             throw new Error(USER_MESSAGE.USER_NOT_FOUND)
           }
+          const {password} = req.body
+          const hashedPassword = hashPassword(password)
+          if (hashedPassword !== user.password) {
+            throw new Error(USER_MESSAGE.PASSWORD_IS_INCORRECT)
+          }
           req.user = user
           return true
         }
@@ -212,15 +218,6 @@ export const loginValidator = validate(
         },
         errorMessage: USER_MESSAGE.PASSWORD_MUSTBE_AT_LEAST_6_CHARACTERS
       },
-      isStrongPassword: {
-        options: {
-          minLength: 6,
-          minLowercase: 1,
-          minUppercase: 1,
-          minNumbers: 1
-        },
-        errorMessage: USER_MESSAGE.PASSWORD_MUST_BE_STRONG
-      }
     }
   }, ['body'])
 )
