@@ -12,7 +12,7 @@ interface UserType {
   email_verify_token?: string
   forgot_password_token?: string
   verify?: UserVerifyStatus
-  twitter_circle?:ObjectId[]
+  twitter_circle?: ObjectId[]
   bio?: string
   location?: string
   website?: string
@@ -31,7 +31,7 @@ export default class User {
   email_verify_token: string
   forgot_password_token: string
   verify: UserVerifyStatus
-  twitter_circle:ObjectId[]
+  twitter_circle: ObjectId[]
   bio: string
   location: string
   website: string

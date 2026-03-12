@@ -23,7 +23,22 @@ import { verifyAccessToken } from './utils/common'
 import { UserVerifyStatus } from './constants/enum'
 import { TokenPayload } from './models/requests/users.requests'
 import initSocket from './utils/socket'
+import YAML from 'yaml'
 
+import swaggerUi from 'swagger-ui-express'
+import swaggerJsdoc from 'swagger-jsdoc'
+
+const options: swaggerJsdoc.Options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Clone Twitter API',
+      version: '1.0.0',
+    },
+  },
+  apis: ['./openapi/*yaml'] // files containing annotations as above
+};
+const openapiSpecification = swaggerJsdoc(options);
 config()
 databaseService.connect().then(
   () => {
@@ -42,6 +57,7 @@ const port = process.env.PORT || 3000
 initFolder()
 app.use(cors())
 app.use(express.json())
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpecification))
 app.use('/users', usersRouter)
 app.use('/medias', mediasRouter)
 app.use('/static', staticRouter)

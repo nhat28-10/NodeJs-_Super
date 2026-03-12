@@ -1,0 +1,81 @@
+components:
+  schemas:
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+          example: nhat1@gmail.com
+        password:
+          type: string
+          example: Nhat12345@
+    SuccessAuthentication:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjlhNTI0NzIyMmYzNDAzMTc3MjY4NjBiIiwidG9rZW5fdHlwZSI6MCwidmVyaWZ5IjoxLCJpYXQiOjE3NzMyOTMxNDYsImV4cCI6MTc3MzM3OTU0Nn0.jV3N5jjI9lhJKw5C2vhPm4E788vU7e_Md0MqEsoHEL8
+        refresh_token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNjlhNTI0NzIyMmYzNDAzMTc3MjY4NjBiIiwidG9rZW5fdHlwZSI6MSwidmVyaWZ5IjoxLCJpYXQiOjE3NzMyOTMxNDYsImV4cCI6MTc4MTkzMzE0Nn0.Un-nS5HpwyVVqkEJ3XNiOsLse_aPG6APPVtYzd7FvqE
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: "69a5247222f340317726860b"
+        name:
+          type: string
+          example: "Nhat"
+        email:
+          type: string
+          format: email
+          example: "nhat1@gmail.com"
+        date_of_birth:
+          type: string
+          format: date-time
+          example: "2025-12-31T04:43:58.335Z"
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-03-02T05:47:30.869Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-03-02T05:48:15.002Z"
+        verify:
+          $ref: "#/components/schemas/UserVerifyStatus"
+        twitter_circle:
+          type: array
+          items:
+            type: string
+            format: MongoId
+          example:
+            - ["698eb6b524d0327c37523221"]
+        bio:
+          type: string
+          example: "Hi this is bio"
+        location:
+          type: string
+          example: "81/43 Bach Van"
+        website:
+          type: string
+          example: "website.com"
+        username:
+          type: string
+          example: "nhat1"
+        avatar:
+          type: string
+          example: http:image/images/avatars/johndoe.jpg"
+        cover_photo:
+          type: string
+          example: "http:image/images/avatars/johndoe.jpg"
+    UserVerifyStatus:
+      type: number
+      enum: [Unverified, Verified, Banned]
+      example: 1
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

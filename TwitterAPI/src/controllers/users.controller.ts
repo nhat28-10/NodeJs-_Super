@@ -3,7 +3,7 @@ import usersService from '~/services/users.service'
 import { NextFunction, ParamsDictionary } from 'express-serve-static-core'
 import { ChangePasswordReqBody, FollowReqBody, forgotPasswordReqBody, LoginRequestBody, LogoutReqBody, RefreshTokenReqBody, RegisterRequest, ResetPasswordReqBody, TokenPayload, UnfollowReqParams, UpdateProfileReqBody, VerifyEmailReqBody, VerifyForgotPasswordReqBody } from '~/models/requests/users.requests'
 import { ObjectId } from 'mongodb'
-import User from '~/models/schemas/Users.model'
+import User from '~/models/schemas/Users.schemas'
 import { USER_MESSAGE } from '~/constants/messages'
 import { ref } from 'process'
 import databaseService from '~/services/database.services'
@@ -14,10 +14,10 @@ import { access } from 'fs'
 import { config } from 'dotenv'
 config()
 
-export const loginController = async  (req:Request<ParamsDictionary, any, LoginRequestBody>, res: Response) => {
+export const loginController = async (req: Request<ParamsDictionary, any, LoginRequestBody>, res: Response) => {
   const user = req.user as User
   const user_id = user._id as ObjectId
-  const result = await usersService.login({user_id: user_id.toString(), verify: user.verify})
+  const result = await usersService.login({ user_id: user_id.toString(), verify: user.verify })
   return res.json({
     message: USER_MESSAGE.LOGIN_SUCCESS,
     result
@@ -25,27 +25,27 @@ export const loginController = async  (req:Request<ParamsDictionary, any, LoginR
 }
 
 export const registerController = async (req: Request<ParamsDictionary, any, RegisterRequest>, res: Response, next: NextFunction) => {
-    
-    const result = await usersService.register(req.body)
-    return res.json({ message: USER_MESSAGE.REGISTER_SUCCESS, result })
+
+  const result = await usersService.register(req.body)
+  return res.json({ message: USER_MESSAGE.REGISTER_SUCCESS, result })
 }
 
-export const logoutController = async (req:Request<ParamsDictionary, any, LogoutReqBody>, res:Response) => {
-  const {refresh_token} = req.body
+export const logoutController = async (req: Request<ParamsDictionary, any, LogoutReqBody>, res: Response) => {
+  const { refresh_token } = req.body
   const result = await usersService.logout(refresh_token)
   return res.json(result)
 }
-export const refreshTokenController = async (req:Request<ParamsDictionary, any, RefreshTokenReqBody>,res:Response) =>  {
-  const {refresh_token} = req.body
-  const {user_id, verify, exp} = req.decoded_refresh_token as TokenPayload
-  const result = await  usersService.refreshToken({user_id,refresh_token,verify,exp})
+export const refreshTokenController = async (req: Request<ParamsDictionary, any, RefreshTokenReqBody>, res: Response) => {
+  const { refresh_token } = req.body
+  const { user_id, verify, exp } = req.decoded_refresh_token as TokenPayload
+  const result = await usersService.refreshToken({ user_id, refresh_token, verify, exp })
   return res.json({
     message: USER_MESSAGE.REFRESH_TOKEN_SUCCESS,
     result
   })
 }
-export const verifyEmailController = async (req:Request<ParamsDictionary, any, VerifyEmailReqBody>, res:Response, next:NextFunction) => {
-  const {user_id} = req.decoded_email_verify_token as TokenPayload
+export const verifyEmailController = async (req: Request<ParamsDictionary, any, VerifyEmailReqBody>, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_email_verify_token as TokenPayload
   const user = await databaseService.users.findOne({
     _id: new ObjectId(user_id)
   })
@@ -67,15 +67,15 @@ export const verifyEmailController = async (req:Request<ParamsDictionary, any, V
     result
   })
 }
-export const resendVerifyEmailController = async (req:Request, res:Response, next: NextFunction) => {
-  const {user_id} = req.decoded_authorization as TokenPayload
-  const user = await databaseService.users.findOne({_id: new ObjectId(user_id)})
-  if(!user) {
+export const resendVerifyEmailController = async (req: Request, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+  if (!user) {
     return res.status(HTTP_STATUS.NOT_FOUND).json({
       message: USER_MESSAGE.USER_NOT_FOUND
     })
   }
-  if(user.verify === UserVerifyStatus.Verified) {
+  if (user.verify === UserVerifyStatus.Verified) {
     return res.json({
       message: USER_MESSAGE.EMAIL_VERIFIED
     })
@@ -84,64 +84,64 @@ export const resendVerifyEmailController = async (req:Request, res:Response, nex
   return res.json(result)
 }
 
-export const forgotPasswordController = async (req:Request<ParamsDictionary, any, forgotPasswordReqBody>, res:Response, next: NextFunction) => {
-  const { _id, verify} = req.user as User
-  const result = await usersService.forgotPassword({user_id:(_id as ObjectId).toString(), verify})
+export const forgotPasswordController = async (req: Request<ParamsDictionary, any, forgotPasswordReqBody>, res: Response, next: NextFunction) => {
+  const { _id, verify } = req.user as User
+  const result = await usersService.forgotPassword({ user_id: (_id as ObjectId).toString(), verify })
   return res.json(result)
 }
-export const verifyForgotPasswordController = async (req:Request<ParamsDictionary, any, VerifyForgotPasswordReqBody>, res:Response, next: NextFunction) => {
+export const verifyForgotPasswordController = async (req: Request<ParamsDictionary, any, VerifyForgotPasswordReqBody>, res: Response, next: NextFunction) => {
   return res.json({
     message: USER_MESSAGE.VERIFY_FORGOT_PASSWORD_SUCCESS
   })
 }
-export const resetPasswordController = async (req:Request<ParamsDictionary, any, ResetPasswordReqBody>, res: Response, next: NextFunction) => {
-  const {user_id} = req.decoded_forgot_password_token as TokenPayload
-  const {password} = req.body
+export const resetPasswordController = async (req: Request<ParamsDictionary, any, ResetPasswordReqBody>, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_forgot_password_token as TokenPayload
+  const { password } = req.body
   const result = await usersService.resetPassword(user_id, password)
   return res.json(result)
 }
 
-export const getProfileController = async (req:Request, res: Response, next: NextFunction) => {
+export const getProfileController = async (req: Request, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  const user = await usersService.getProfile(user_id) 
+  const user = await usersService.getProfile(user_id)
   return res.json({
-    message:USER_MESSAGE.GET_PROFILE_SUCCESS,
+    message: USER_MESSAGE.GET_PROFILE_SUCCESS,
     result: user
   })
 }
 
-export const updateProfileController = async (req: Request<ParamsDictionary, any, UpdateProfileReqBody>, res:Response, next:NextFunction) => {
-  const {user_id} = req.decoded_authorization as TokenPayload
-  const {body} = req
-  const user = await usersService.updateProfile(user_id,body)
+export const updateProfileController = async (req: Request<ParamsDictionary, any, UpdateProfileReqBody>, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { body } = req
+  const user = await usersService.updateProfile(user_id, body)
   return res.json({
     message: USER_MESSAGE.UDPATE_PROFILE_SUCCESS,
     result: user
   })
 }
-export const followController = async (req: Request<ParamsDictionary, any, FollowReqBody>, res:Response, next:NextFunction) => {
+export const followController = async (req: Request<ParamsDictionary, any, FollowReqBody>, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const { followed_user_id } = req.body
-  const result = await usersService.follow(user_id,followed_user_id)
+  const result = await usersService.follow(user_id, followed_user_id)
   return res.json(result)
 }
 
-export const unfollowController = async (req: Request<UnfollowReqParams>, res:Response, next:NextFunction) => {
+export const unfollowController = async (req: Request<UnfollowReqParams>, res: Response, next: NextFunction) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const { user_id: followed_user_id } = req.params
-  const result = await usersService.unfollow(user_id,followed_user_id)
+  const result = await usersService.unfollow(user_id, followed_user_id)
   return res.json(result)
 }
 
-export const changePasswordController = async (req: Request<ParamsDictionary, any, ChangePasswordReqBody>,res:Response,next:NextFunction) => {
-  const {user_id} = req.decoded_authorization as TokenPayload
-  const {password} = req.body
+export const changePasswordController = async (req: Request<ParamsDictionary, any, ChangePasswordReqBody>, res: Response, next: NextFunction) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { password } = req.body
   const result = await usersService.changePassword(user_id, password)
   return res.json(result)
 }
 
-export const oauthController = async (req:Request, res: Response) => {
-  const {code} = req.query
+export const oauthController = async (req: Request, res: Response) => {
+  const { code } = req.query
   const result = await usersService.oauth(code as string)
   const urlRedirect = `${process.env.CLIENT_REDIRECT_CALLBACK}?access_token=${result.access_token}
   &refresh_token=${result.refresh_token}&new_user=${result.newUser}`

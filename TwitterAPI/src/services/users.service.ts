@@ -1,4 +1,4 @@
-import User from '~/models/schemas/Users.model'
+import User from '~/models/schemas/Users.schemas'
 import databaseService from './database.services'
 import RefreshToken from '../models/schemas/Refresh_token.schemas'
 import { RegisterRequest, UpdateProfileReqBody } from '~/models/requests/users.requests'
@@ -152,9 +152,9 @@ class UsersService {
     })
     await databaseService.users.insertOne(userDoc)
     const [access_token, refresh_token] = await this.signAccessAndRefreshToken({ user_id: user_id.toString(), verify: UserVerifyStatus.Unverified })
-    const {iat, exp} = await this.decodeRefreshToken(refresh_token)
+    const { iat, exp } = await this.decodeRefreshToken(refresh_token)
     await databaseService.refreshTokens.insertOne(
-      new RefreshToken({user_id: new ObjectId(user_id),token:refresh_token, iat, exp})
+      new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token, iat, exp })
     )
     return { access_token, refresh_token }
   }
@@ -166,8 +166,10 @@ class UsersService {
     ])
     const decoded_refreshtoken = await this.decodeRefreshToken(new_refresh_token)
     await databaseService.refreshTokens.insertOne(
-      new RefreshToken({user_id: new ObjectId(user_id),token: new_refresh_token,
-        iat: decoded_refreshtoken.iat, exp: decoded_refreshtoken.exp})
+      new RefreshToken({
+        user_id: new ObjectId(user_id), token: new_refresh_token,
+        iat: decoded_refreshtoken.iat, exp: decoded_refreshtoken.exp
+      })
     )
     return {
       access_token: new_access_token,
@@ -183,7 +185,7 @@ class UsersService {
       await this.signAccessAndRefreshToken({ user_id, verify: UserVerifyStatus.Verified })
 
     // decode refresh token để lấy iat, exp
-    const {iat, exp} = await this.decodeRefreshToken(refresh_token)
+    const { iat, exp } = await this.decodeRefreshToken(refresh_token)
     // 🔥 LƯU REFRESH TOKEN VÀO DATABASE
     await databaseService.refreshTokens.insertOne(
       new RefreshToken({
@@ -218,9 +220,9 @@ class UsersService {
         user_id: user._id.toString(),
         verify: user.verify
       })
-      const {iat, exp} = await this.decodeRefreshToken(refresh_token)
+      const { iat, exp } = await this.decodeRefreshToken(refresh_token)
       await databaseService.refreshTokens.insertOne(
-        new RefreshToken({user_id: user._id,token:refresh_token, iat, exp})
+        new RefreshToken({ user_id: user._id, token: refresh_token, iat, exp })
       )
       return { access_token, refresh_token, newUser: 0, verify: user.verify }
     } else {
@@ -256,9 +258,9 @@ class UsersService {
     )
     ])
     const [access_token, refresh_token] = token
-    const {iat, exp} = await this.decodeRefreshToken(refresh_token)
+    const { iat, exp } = await this.decodeRefreshToken(refresh_token)
     await databaseService.refreshTokens.insertOne(
-      new RefreshToken({user_id:new ObjectId(user_id),token:refresh_token,iat,exp})
+      new RefreshToken({ user_id: new ObjectId(user_id), token: refresh_token, iat, exp })
     )
     return {
       access_token,

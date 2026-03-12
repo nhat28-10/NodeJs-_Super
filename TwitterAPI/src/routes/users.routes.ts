@@ -12,10 +12,36 @@ usersRouter.use((req, res, next) => {
   next()
 })
 /**
- * Description. Login to system
- * PATH: /login
- * METHOD: POST
- * Body: {email:string, password:string}
+ * @swagger
+ * /users/login:
+ *   post:
+ *     tags:
+ *       - users
+ *     summary: Đăng nhập
+ *     description: Người dùng đăng nhập vào hệ thống
+ *     operationId: login
+ *     requestBody:
+ *       description: Thông tin đăng nhập
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginBody'
+ *     responses:
+ *       200:
+ *         description: Đăng nhập thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Login success
+ *                 result:
+ *                   $ref: '#/components/schemas/SuccessAuthentication'
+ *       422:
+ *         description: Invalid input
  */
 usersRouter.post('/login', loginValidator, warpRequestHandler(loginController))
 /**
@@ -39,14 +65,14 @@ usersRouter.post('/register', registerValidator, warpRequestHandler(registerCont
  * Header: {Authorization: Bearer <access_token>}
  * Body: {refresh_token:string}
  */
-usersRouter.post('/logout', accessTokenValidator,refreshTokenValidator, warpRequestHandler(logoutController))
+usersRouter.post('/logout', accessTokenValidator, refreshTokenValidator, warpRequestHandler(logoutController))
 /**
  * Description: Refresh token
  * PATH: /refresh-token
  * METHOD: POST
  * Body: {refresh_token:string}
  */
-usersRouter.post('/refresh-token',refreshTokenValidator, warpRequestHandler(refreshTokenController))
+usersRouter.post('/refresh-token', refreshTokenValidator, warpRequestHandler(refreshTokenController))
 
 /**
  * Description: Verify email user when user click on the link in email
@@ -69,7 +95,7 @@ usersRouter.post('/resend-verify-email', accessTokenValidator, warpRequestHandle
  * METHOD: POST
  * Body: {email:string}
  */
-usersRouter.post('/forgot-password', forgotPasswordValidator, warpRequestHandler(forgotPasswordController ))
+usersRouter.post('/forgot-password', forgotPasswordValidator, warpRequestHandler(forgotPasswordController))
 
 /**
  * DESCIPRTION: Verify link to reset password
@@ -88,12 +114,31 @@ usersRouter.post('/verify-forgot-password', verifyForgotPasswordTokenValidator, 
 usersRouter.post('/reset-password', resetPasswordValidator, warpRequestHandler(resetPasswordController))
 
 /**
- * DESCRIPTION: Get user profile
- * PATH: /my-profile
- * METHOD: GET
- * HEADER: {Authorization: Bearer <access_token>}
+ * @swagger
+ * /users/me:
+ *   get:
+ *     tags:
+ *       - users
+ *     summary: Lấy thông tin user
+ *     description: Người dùng lấy thông tin từ tài khoản của họ
+ *     operationId: me
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lấy thông tin user thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Get profile success
+ *                 result:
+ *                   $ref: '#/components/schemas/User'
  */
-usersRouter.get('/me',accessTokenValidator,warpRequestHandler(getProfileController))
+usersRouter.get('/me', accessTokenValidator, warpRequestHandler(getProfileController))
 
 /**
  * DESCRIPTION: Update user profile
@@ -107,7 +152,7 @@ usersRouter.patch(
   accessTokenValidator,
   verifiedUserValidator,
   updateProfileValidator,
-  filterMiddleware<UpdateProfileReqBody>(['name', 'date_of_birth', 'bio', 'location', 'website', 'avatar', 'username','cover_photo']),
+  filterMiddleware<UpdateProfileReqBody>(['name', 'date_of_birth', 'bio', 'location', 'website', 'avatar', 'username', 'cover_photo']),
   warpRequestHandler(updateProfileController))
 
 /**
@@ -120,7 +165,7 @@ usersRouter.patch(
 usersRouter.post('/follow',
   accessTokenValidator,
   verifiedUserValidator,
-  followValidator, 
+  followValidator,
   warpRequestHandler(followController))
 /**
  * DESCRIPTION: User unfollow someone
@@ -132,7 +177,7 @@ usersRouter.post('/follow',
 usersRouter.delete('/follow/:user_id',
   accessTokenValidator,
   verifiedUserValidator,
-  unfollowValidator, 
+  unfollowValidator,
   warpRequestHandler(unfollowController)
 )
 /**
@@ -142,7 +187,7 @@ usersRouter.delete('/follow/:user_id',
  * Headers: {Authorization: Bearer <access_token>}
  * Body {current_password: string, password: string, confirm_password: string}
  */
-usersRouter.put('/change-password',accessTokenValidator,verifiedUserValidator,changePasswordValidator,
+usersRouter.put('/change-password', accessTokenValidator, verifiedUserValidator, changePasswordValidator,
   warpRequestHandler(changePasswordController)
 )
 export default usersRouter

@@ -1,6 +1,6 @@
 import { MongoClient, Db, Collection } from 'mongodb'
 import { config } from 'dotenv'
-import User from '../models/schemas/Users.model'
+import User from '../models/schemas/Users.schemas'
 import Refresh_token from '~/models/schemas/Refresh_token.schemas'
 import Follower from '~/models/schemas/Followers.schemas'
 import VideoStatus from '~/models/schemas/VideoStatus.schemas'
@@ -43,19 +43,19 @@ class DatabaseService {
     }
   }
   async indexRefreshTokens() {
-    const exists = await this.refreshTokens.indexExists(['refresh_token_1','exp_1'])
+    const exists = await this.refreshTokens.indexExists(['refresh_token_1', 'exp_1'])
     if (!exists) {
       this.refreshTokens.createIndex({ refresh_token: 1 });
       this.refreshTokens.createIndex({ exp: 1 }, { expireAfterSeconds: 0 })
     }
-    
+
   }
   async indexVideoStatus() {
     const exists = await this.videoStatus.indexExists(['name_1'])
     if (!exists) {
       this.videoStatus.createIndex({ name: 1 })
     }
-    
+
   }
   async indexFollowers() {
     const exists = await this.followers.indexExists(['user_id_1_followed_user_id_1'])
@@ -66,13 +66,13 @@ class DatabaseService {
   async indexTweets() {
     const exists = await this.tweets.indexExists(['content_text'])
     if (!exists) {
-      this.tweets.createIndex({content: 'text'}, {default_language: 'none'})
+      this.tweets.createIndex({ content: 'text' }, { default_language: 'none' })
     }
   }
   async indexConversation() {
     const exists = await this.conversation.indexExists(['sender_1_receiver_id_1_created_at_1'])
     if (!exists) {
-      this.conversation.createIndex({sender:1,receiver_id:1,created_at:1})
+      this.conversation.createIndex({ sender: 1, receiver_id: 1, created_at: 1 })
     }
   }
   get users(): Collection<User> {
@@ -99,7 +99,7 @@ class DatabaseService {
   get likes(): Collection<Like> {
     return this.db.collection(process.env.DB_LIKE_COLLECTION as string)
   }
-  get conversation() :Collection<Conversation> {
+  get conversation(): Collection<Conversation> {
     return this.db.collection(process.env.DB_CONVERSATION_COLLECTION as string)
   }
 }

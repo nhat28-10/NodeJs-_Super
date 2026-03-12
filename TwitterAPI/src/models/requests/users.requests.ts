@@ -37,20 +37,20 @@ export interface VerifyForgotPasswordReqBody {
   forgot_password_token: string
 }
 export interface ResetPasswordReqBody {
-  password:string
-  confirm_password:string
-  forgot_password_token:string
+  password: string
+  confirm_password: string
+  forgot_password_token: string
 }
 
 export interface UpdateProfileReqBody {
   name?: string,
   date_of_birth?: string,
-  bio?:string,
-  location?:string,
+  bio?: string,
+  location?: string,
   website?: string,
-  username?:string,
-  avatar?:string,
-  cover_photo?:string,
+  username?: string,
+  avatar?: string,
+  cover_photo?: string,
 }
 
 export interface FollowReqBody {
@@ -63,6 +63,49 @@ export interface UnfollowReqParams extends ParamsDictionary {
 
 export interface ChangePasswordReqBody {
   current_password: string
-  password:string
-  confirm_password:string
+  password: string
+  confirm_password: string
 }
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     LoginBody:
+ *       type: object
+ *       properties:
+ *         email:
+ *           type: string
+ *           example: nhat1@gmail.com
+ *         password:
+ *           type: string
+ *           example: Nhat12345@
+ *
+ *     SuccessAuthentication:
+ *       type: object
+ *       properties:
+ *         access_token:
+ *           type: string
+ *         refresh_token:
+ *           type: string
+ *
+ *     User:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           example: 69a5247222f340317726860b
+ *         name:
+ *           type: string
+ *           example: Nhat
+ *         email:
+ *           type: string
+ *           example: nhat1@gmail.com
+ *         username:
+ *           type: string
+ *           example: nhat1
+ *
+ *     UserVerifyStatus:
+ *       type: number
+ *       enum: [0,1,2]
+ *       example: 1
+ */
